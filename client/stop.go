@@ -1,0 +1,52 @@
+package client
+
+import (
+	"errors"
+	"flag"
+	"net/rpc"
+	"strconv"
+
+	"bitbucket.org/dullgiulio/ringio/server"
+	"bitbucket.org/dullgiulio/ringio/utils"
+)
+
+type CommandStop struct {
+	client   *rpc.Client
+	response *server.RpcResp
+}
+
+func NewCommandStop() *CommandStop {
+	return &CommandStop{
+		response: new(server.RpcResp),
+	}
+}
+
+func (c *CommandStop) Help() string {
+	return `List all agents`
+}
+
+func (c *CommandStop) Init(fs *flag.FlagSet) error {
+	// nothing to do yet.
+	return nil
+}
+
+func (c *CommandStop) Run(cli *Cli) error {
+	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
+		utils.Fatal(err)
+	} else {
+		c.client = client
+	}
+
+	if len(cli.Args) < 1 {
+		utils.Fatal(errors.New("Stop must be followed by an argument."))
+	}
+
+	// Stop program by id
+	if id, err := strconv.Atoi(cli.Args[0]); err != nil {
+		utils.Fatal(err)
+	} else if err = c.client.Call("RpcServer.Stop", id, &c.response); err != nil {
+		utils.Fatal(err)
+	}
+
+	return nil
+}

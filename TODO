@@ -1,0 +1,11 @@
+* output 1 -> shows output from agent 1
+* error 1 -> shows errors from agent 1
+* errors -> shows all errors
+
+* various flags, especially for main conf.
+
+* seekable ringbuf (reader can seek to beginning or end)
+
+* see fio ( http://linux.die.net/man/1/fio ) for options and ideas.
+* see splice(2) for an almost zero-copy data piping between commands.
+
