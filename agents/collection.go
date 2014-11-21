@@ -164,9 +164,6 @@ func (c *Collection) Run(autorun bool) {
 	go c.output.Run()
 	go c.stdout.Run()
 
-	// From now on, logs will be written here too.
-	log.AddWriter(ringbuf.NewBytes(c.errors))
-
 	waitedAgents := make(map[AgentRole]int)
 
 	for msg := range c.requestCh {
@@ -286,7 +283,8 @@ func (c *Collection) Run(autorun bool) {
 
 		if config.C.AutoExit &&
 			waitedAgents[AgentRoleSource] <= 0 &&
-			waitedAgents[AgentRoleSink] <= 0 {
+			waitedAgents[AgentRoleSink] <= 0 &&
+			waitedAgents[AgentRoleLog] <= 0 {
 			log.Debug(log.FacilityAgent, "No more agents to wait for, exiting main loop")
 			c.Close()
 			return

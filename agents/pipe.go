@@ -20,7 +20,9 @@ func NewAgentPipe(pipeName string, role AgentRole) *AgentPipe {
 }
 
 func (a *AgentPipe) Init() {
-	if a.meta.Role == AgentRoleSink || a.meta.Role == AgentRoleErrors {
+	if a.meta.Role == AgentRoleSink ||
+		a.meta.Role == AgentRoleErrors ||
+		a.meta.Role == AgentRoleLog {
 		if ok := a.pipe.OpenWrite(); !ok {
 			return
 		}

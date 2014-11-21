@@ -2,6 +2,7 @@ package agents
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"sync"
 
@@ -18,7 +19,7 @@ func _writeToChan(c chan<- []byte, cancel chan bool, reader io.ReadCloser) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Error(log.FacilityAgent, err)
+		log.Error(log.FacilityAgent, fmt.Errorf("bufio.Scanner: %v", err))
 	}
 
 	log.Debug(log.FacilityAgent, "Writing into channel from input has terminated")
@@ -65,20 +66,19 @@ func _readInnerLoop(c <-chan interface{}, cancel <-chan bool, output *bufio.Writ
 			m := msg.Cast(data)
 
 			if _, err := output.Write(m.Data()); err != nil {
-				log.Error(log.FacilityAgent, err)
+				log.Error(log.FacilityAgent, fmt.Errorf("bufio.Write: %v", err))
 				return
 			}
 			if err := output.WriteByte('\n'); err != nil {
-				log.Error(log.FacilityAgent, err)
+				log.Error(log.FacilityAgent, fmt.Errorf("bufio.WriteByte: %v", err))
 				return
 			}
 			if err := output.Flush(); err != nil {
-				log.Error(log.FacilityAgent, err)
+				log.Error(log.FacilityAgent, fmt.Errorf("bufio.Flush: %v", err))
 				return
 			}
 		case <-cancel:
 			cancelled = true
-			log.Debug(log.FacilityAgent, "Read from ringbuf has been cancelled")
 			return
 		}
 	}
@@ -97,6 +97,8 @@ func readFromRingbuf(writer io.WriteCloser, ring *ringbuf.Ringbuf, cancel <-chan
 
 	reader.Cancel()
 	writer.Close()
+
+	log.Debug(log.FacilityAgent, "Read from ringbuf has been cancelled")
 
 	return
 }

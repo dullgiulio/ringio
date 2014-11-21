@@ -48,6 +48,10 @@ func addSinkAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName str
 	_addSinkAgentPipe(client, response, pipeName, agents.AgentRoleSink)
 }
 
+func addLogAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName string) {
+    _addSinkAgentPipe(client, response, pipeName, agents.AgentRoleLog)
+}
+
 func _addSinkAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName string, role agents.AgentRole) {
 	var id int
 

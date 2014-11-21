@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"bitbucket.org/dullgiulio/ringbuf"
+	"bitbucket.org/dullgiulio/ringio/config"
 )
 
 type AgentType int
@@ -27,6 +28,7 @@ const (
 	AgentRoleSink = iota
 	AgentRoleSource
 	AgentRoleErrors
+	AgentRoleLog
 )
 
 type AgentRole int
@@ -108,29 +110,33 @@ type Agent interface {
 	InputFromRingbuf(stdout, errors, output *ringbuf.Ringbuf)
 }
 
-func (ac *Collection) outputToRingbuf(a Agent) {
-	a.OutputToRingbuf(ac.errors, ac.output)
-
+func (ac *Collection) _responseOk(a Agent) {
 	resp := NewAgentMessageResponseBool()
 	ac.SetAgentStatusFinished(a, &resp)
 	resp.Get()
 }
 
+func (ac *Collection) outputToRingbuf(a Agent) {
+	a.OutputToRingbuf(ac.errors, ac.output)
+	ac._responseOk(a)
+}
+
 func (ac *Collection) inputFromRingbuf(a Agent) {
 	a.InputFromRingbuf(ac.stdout, ac.errors, ac.output)
-
-	resp := NewAgentMessageResponseBool()
-	ac.SetAgentStatusFinished(a, &resp)
-	resp.Get()
+	ac._responseOk(a)
 }
 
 func (ac *Collection) errorsFromRingbuf(a Agent) {
 	// We both read and write on errors.
 	a.InputFromRingbuf(ac.errors, ac.errors, ac.errors)
+	ac._responseOk(a)
+}
 
-	resp := NewAgentMessageResponseBool()
-	ac.SetAgentStatusFinished(a, &resp)
-	resp.Get()
+func (ac *Collection) logFromRingbuf(a Agent) {
+	logring := config.GetLogRingbuf()
+
+	a.InputFromRingbuf(logring, logring, logring)
+	ac._responseOk(a)
 }
 
 func (ac *Collection) runAgent(a Agent) {
@@ -145,5 +151,7 @@ func (ac *Collection) runAgent(a Agent) {
 		ac.errorsFromRingbuf(a)
 	case AgentRoleSink:
 		ac.inputFromRingbuf(a)
+	case AgentRoleLog:
+		ac.logFromRingbuf(a)
 	}
 }

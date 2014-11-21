@@ -8,8 +8,6 @@ import (
 	"bitbucket.org/dullgiulio/ringio/utils"
 )
 
-// TODO
-
 type CommandLog struct {
 	client   *rpc.Client
 	response *server.RpcResp
@@ -22,7 +20,7 @@ func NewCommandLog() *CommandLog {
 }
 
 func (c *CommandLog) Help() string {
-	return `Take data and writes it into the ringbuf.`
+	return `Output data from the ringbuf.`
 }
 
 func (c *CommandLog) Init(fs *flag.FlagSet) error {
@@ -37,10 +35,7 @@ func (c *CommandLog) Run(cli *Cli) error {
 		c.client = client
 	}
 
-	if len(cli.Args) == 0 {
-		addSourceAgentPipe(c.client, c.response, utils.GetRandomDotfile())
-	} else {
-		addSourceAgentCmd(c.client, c.response, cli.Args)
-	}
+    addLogAgentPipe(c.client, c.response, utils.GetRandomDotfile())
+
 	return nil
 }
