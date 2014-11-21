@@ -100,8 +100,6 @@ func Run(minLevel Level) bool {
 		LevelFail:  "FAIL",
 	}
 
-	defer close(_logger.c)
-
 	for m := range _logger.c {
 		if m.level == LevelCancel {
 			return true

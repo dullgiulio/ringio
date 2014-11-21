@@ -28,8 +28,10 @@ func _writeToChan(c chan<- []byte, cancel chan bool, reader io.ReadCloser) {
 	close(c)
 }
 
-func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel chan bool, wg *sync.WaitGroup) {
-	defer wg.Done()
+func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel chan bool, wg *sync.WaitGroup) (cancelled bool) {
+	if wg != nil {
+		defer wg.Done()
+	}
 
 	c := make(chan []byte)
 
@@ -44,6 +46,7 @@ func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel 
 
 			ring.Write(msg.Msg(id, data))
 		case <-cancel:
+			cancelled = true
 			log.Debug(log.FacilityAgent, "Writing into ringbuf from input has been cancelled")
 			reader.Close()
 			return
@@ -51,7 +54,7 @@ func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel 
 	}
 }
 
-func _readInnerLoop(c <-chan interface{}, cancel <-chan bool, output *bufio.Writer) (cancelReceived bool) {
+func _readInnerLoop(c <-chan interface{}, cancel <-chan bool, output *bufio.Writer) (cancelled bool) {
 	for {
 		select {
 		case data := <-c:
@@ -74,26 +77,26 @@ func _readInnerLoop(c <-chan interface{}, cancel <-chan bool, output *bufio.Writ
 				return
 			}
 		case <-cancel:
-			cancelReceived = true
+			cancelled = true
 			log.Debug(log.FacilityAgent, "Read from ringbuf has been cancelled")
 			return
 		}
 	}
 }
 
-func readFromRingbuf(writer io.WriteCloser, ring *ringbuf.Ringbuf, cancel <-chan bool, wg *sync.WaitGroup) {
-	defer wg.Done()
+func readFromRingbuf(writer io.WriteCloser, ring *ringbuf.Ringbuf, cancel <-chan bool, wg *sync.WaitGroup) (cancelled bool) {
+	if wg != nil {
+		defer wg.Done()
+	}
 
 	reader := ringbuf.NewRingbufReader(ring)
 	output := bufio.NewWriter(writer)
 	c := reader.ReadCh()
 
-	cancelled := _readInnerLoop(c, cancel, output)
+	cancelled = _readInnerLoop(c, cancel, output)
 
 	reader.Cancel()
 	writer.Close()
 
-	if !cancelled {
-		<-cancel
-	}
+	return
 }

@@ -1,8 +1,6 @@
 package agents
 
 import (
-	"sync"
-
 	"bitbucket.org/dullgiulio/ringbuf"
 	"bitbucket.org/dullgiulio/ringio/pipe"
 )
@@ -59,12 +57,11 @@ func (a *AgentPipe) OutputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 
 	id := a.meta.Id
 
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
+	cancelled := writeToRingbuf(id, a.pipe, rOutput, a.cancel, nil)
 
-	go writeToRingbuf(id, a.pipe, rOutput, a.cancel, wg)
-
-	wg.Wait()
+	if !cancelled {
+		<-a.cancel
+	}
 
 	close(a.cancel)
 
@@ -72,12 +69,11 @@ func (a *AgentPipe) OutputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 }
 
 func (a *AgentPipe) InputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
+	cancelled := readFromRingbuf(a.pipe, rOutput, a.cancel, nil)
 
-	go readFromRingbuf(a.pipe, rOutput, a.cancel, wg)
-
-	wg.Wait()
+	if !cancelled {
+		<-a.cancel
+	}
 
 	close(a.cancel)
 

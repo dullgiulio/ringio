@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/dullgiulio/ringbuf"
 	"bitbucket.org/dullgiulio/ringio/agents"
+	"bitbucket.org/dullgiulio/ringio/config"
 	"bitbucket.org/dullgiulio/ringio/log"
 	"bitbucket.org/dullgiulio/ringio/onexit"
 	"bitbucket.org/dullgiulio/ringio/utils"
@@ -52,11 +53,16 @@ var logring *ringbuf.Ringbuf
 func Init() {
 	nw := log.NewNewlineWriter(os.Stderr)
 	log.AddWriter(nw)
+
+	logring = ringbuf.NewRingbuf(config.C.RingbufLogSize)
+	go logring.Run()
+
+	lw := ringbuf.NewBytes(logring)
+	log.AddWriter(lw)
 }
 
 func Run(sessionName string) (returnStatus int) {
-	// TODO: second argument (autorun) can be false if --no-autorun is specified.
-	s := NewRpcServer(sessionName, true)
+	s := NewRpcServer(sessionName, config.C.AutoRun)
 
 	// Serve RPC calls.
 	go s.serve()
@@ -66,7 +72,6 @@ func Run(sessionName string) (returnStatus int) {
 		s.relayErrorsAndOutput()
 
 		log.Cancel()
-		logring.Cancel()
 	}()
 
 	// Print all logged information.
@@ -75,7 +80,6 @@ func Run(sessionName string) (returnStatus int) {
 		returnStatus = 1
 	}
 
-	// XXX: Logging is not available after this point.
 	s.cleanup()
 
 	return

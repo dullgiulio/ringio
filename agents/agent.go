@@ -78,16 +78,16 @@ func (a *AgentDescr) String() string {
 		flow = "[ring] <-"
 	}
 
-    return fmt.Sprintf("%d %s: %s %s",
+	return fmt.Sprintf("%d %s: %s %s",
 		a.Meta.Id, a.Meta.Status.String(), flow, args)
 }
 
 func (a *AgentDescr) Text() string {
-    var started, finished string
+	var started, finished string
 
-    str := a.String()
+	str := a.String()
 
-    if a.Meta.Status != AgentStatusNone {
+	if a.Meta.Status != AgentStatusNone {
 		started = fmt.Sprintf("  Started: %s\n", a.Meta.Started.Format("2006-01-02 15:04:05 -0700 MST"))
 	}
 
@@ -95,7 +95,7 @@ func (a *AgentDescr) Text() string {
 		finished = fmt.Sprintf("  Finished: %s\n", a.Meta.Finished.Format("2006-01-02 15:04:05 -0700 MST"))
 	}
 
-    return fmt.Sprintf("%s\n%s%s", str, started, finished)
+	return fmt.Sprintf("%s\n%s%s", str, started, finished)
 }
 
 type Agent interface {

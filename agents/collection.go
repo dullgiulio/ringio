@@ -157,7 +157,7 @@ func (c *Collection) Swap(i, j int) {
 }
 
 func (c *Collection) Run(autorun bool) {
-	var addingLocked, sorted, outputEof bool
+	var addingLocked, sorted bool
 
 	go c.errors.Run()
 	go c.output.Run()
@@ -165,15 +165,6 @@ func (c *Collection) Run(autorun bool) {
 
 	// From now on, logs will be written here too.
 	log.AddWriter(ringbuf.NewBytes(c.errors))
-
-	defer func() {
-		c.errors.Eof()
-		c.stdout.Eof()
-
-		if !outputEof {
-			c.output.Eof()
-		}
-	}()
 
 	waitedAgents := make(map[AgentRole]int)
 
@@ -287,7 +278,6 @@ func (c *Collection) Run(autorun bool) {
 		if addingLocked && autorun &&
 			waitedAgents[AgentRoleSource] == 0 {
 			c.output.Eof()
-			outputEof = true
 
 			// Must not send EOF to the ringbuf twice.
 			waitedAgents[AgentRoleSource] = -1
