@@ -141,12 +141,13 @@ func (c *Collection) Less(i, j int) bool {
 	metaI := c.agents[i].Meta()
 	metaJ := c.agents[j].Meta()
 
-	if metaI.Role < metaJ.Role {
+	if metaI.Status < metaJ.Status {
 		return true
 	}
 
-	if metaI.Role == metaJ.Role {
-		return metaI.Started.Before(metaJ.Started)
+	if metaI.Status == metaJ.Status &&
+		metaI.Id < metaJ.Id {
+		return true
 	}
 
 	return false
