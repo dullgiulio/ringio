@@ -31,11 +31,7 @@ func (c *CommandStop) Init(fs *flag.FlagSet) error {
 }
 
 func (c *CommandStop) Run(cli *Cli) error {
-	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
-		utils.Fatal(err)
-	} else {
-		c.client = client
-	}
+	c.client = cli.GetClient()
 
 	if len(cli.Args) < 1 {
 		utils.Fatal(errors.New("Stop must be followed by an argument."))

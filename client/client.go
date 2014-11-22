@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net/rpc"
 
 	"bitbucket.org/dullgiulio/ringio/utils"
 )
@@ -126,4 +127,13 @@ func (cli *Cli) Run() {
 	if err := cli.client.Run(cli); err != nil {
 		utils.Fatal(err)
 	}
+}
+
+func (cli *Cli) GetClient() *rpc.Client {
+	client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session))
+	if err != nil {
+		utils.Fatal(err)
+	}
+
+	return client
 }

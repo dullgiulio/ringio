@@ -29,13 +29,9 @@ func (c *CommandSet) Init(fs *flag.FlagSet) error {
 }
 
 func (c *CommandSet) Run(cli *Cli) error {
-	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
-		utils.Fatal(err)
-	} else {
-		c.client = client
-	}
-
 	var action server.ServerAction
+
+	c.client = cli.GetClient()
 
 	// TODO: set minimum logging level here.
 	switch cli.Args[0] {

@@ -29,11 +29,7 @@ func (c *CommandRun) Init(fs *flag.FlagSet) error {
 }
 
 func (c *CommandRun) Run(cli *Cli) error {
-	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
-		utils.Fatal(err)
-	} else {
-		c.client = client
-	}
+	c.client = cli.GetClient()
 
 	if err := c.client.Call("RpcServer.Run", &server.RpcReq{}, &c.response); err != nil {
 		utils.Fatal(err)

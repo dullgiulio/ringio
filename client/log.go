@@ -29,11 +29,7 @@ func (c *CommandLog) Init(fs *flag.FlagSet) error {
 }
 
 func (c *CommandLog) Run(cli *Cli) error {
-	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
-		utils.Fatal(err)
-	} else {
-		c.client = client
-	}
+	c.client = cli.GetClient()
 
 	addLogAgentPipe(c.client, c.response, utils.GetRandomDotfile())
 

@@ -29,11 +29,7 @@ func (c *CommandList) Init(fs *flag.FlagSet) error {
 }
 
 func (c *CommandList) Run(cli *Cli) error {
-	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
-		utils.Fatal(err)
-	} else {
-		c.client = client
-	}
+	c.client = cli.GetClient()
 
 	responseList := agents.NewAgentMessageResponseList()
 	if err := c.client.Call("RpcServer.List", &server.RpcReq{}, &responseList); err != nil {

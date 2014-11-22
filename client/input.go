@@ -29,11 +29,7 @@ func (c *CommandInput) Init(fs *flag.FlagSet) error {
 }
 
 func (c *CommandInput) Run(cli *Cli) error {
-	if client, err := rpc.Dial("unix", utils.FileInDotpath(cli.Session)); err != nil {
-		utils.Fatal(err)
-	} else {
-		c.client = client
-	}
+	c.client = cli.GetClient()
 
 	if len(cli.Args) == 0 {
 		addSourceAgentPipe(c.client, c.response, utils.GetRandomDotfile())
