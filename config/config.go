@@ -21,7 +21,7 @@ var defaults _Config = _Config{
 	RingbufLogSize: 1024,
 	MaxLineSize:    1024,
 	AutoRun:        true,
-	AutoExit:       true,
+	AutoExit:       false,
 	AutoLock:       false,
 }
 
