@@ -6,7 +6,7 @@ import (
 
 	"bitbucket.org/dullgiulio/ringio/client"
 	"bitbucket.org/dullgiulio/ringio/config"
-    "bitbucket.org/dullgiulio/ringio/onexit"
+	"bitbucket.org/dullgiulio/ringio/onexit"
 	"bitbucket.org/dullgiulio/ringio/utils"
 )
 
@@ -14,7 +14,7 @@ func main() {
 	// Handle interrupt signals.
 	onexit.HandleInterrupt()
 
-    config.Init()
+	config.Init()
 
 	cli := client.NewCli()
 	if err := cli.ParseArgs(os.Args); err != nil {
