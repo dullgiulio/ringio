@@ -49,7 +49,9 @@ func NewCli() *Cli {
 func (cli *Cli) ParseArgs(args []string) error {
 	var cmdCommand map[string]Command = map[string]Command{
 		"input":  Input,
+		"in":     Input,
 		"output": Output,
+		"out":    Output,
 		"log":    Log,
 		"run":    Run,
 		"open":   Open,
