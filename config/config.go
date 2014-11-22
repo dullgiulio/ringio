@@ -1,7 +1,7 @@
 package config
 
 import (
-    "bitbucket.org/dullgiulio/ringbuf"
+	"bitbucket.org/dullgiulio/ringbuf"
 )
 
 type _Config struct {
@@ -11,7 +11,7 @@ type _Config struct {
 	AutoExit       bool
 	AutoLock       bool
 	AutoRun        bool
-    logring        *ringbuf.Ringbuf
+	logring        *ringbuf.Ringbuf
 }
 
 var C *_Config
@@ -30,12 +30,12 @@ func init() {
 }
 
 func Init() {
-    C.logring = ringbuf.NewRingbuf(C.RingbufLogSize)
-    go C.logring.Run()
+	C.logring = ringbuf.NewRingbuf(C.RingbufLogSize)
+	go C.logring.Run()
 }
 
 func GetLogRingbuf() *ringbuf.Ringbuf {
-    return C.logring
+	return C.logring
 }
 
 // This module is not thread safe. After initialization from flags,

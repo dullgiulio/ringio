@@ -35,7 +35,7 @@ func (c *CommandLog) Run(cli *Cli) error {
 		c.client = client
 	}
 
-    addLogAgentPipe(c.client, c.response, utils.GetRandomDotfile())
+	addLogAgentPipe(c.client, c.response, utils.GetRandomDotfile())
 
 	return nil
 }
