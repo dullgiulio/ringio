@@ -49,8 +49,10 @@ type RpcResp bool
 var sessionOver error = errors.New("Session has already terminated")
 
 func Init() {
-	nw := log.NewNewlineWriter(os.Stderr)
-	log.AddWriter(nw)
+	if config.C.PrintLog {
+		nw := log.NewNewlineWriter(os.Stderr)
+		log.AddWriter(nw)
+	}
 
 	lw := ringbuf.NewBytes(config.GetLogRingbuf())
 	log.AddWriter(lw)

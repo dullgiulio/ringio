@@ -11,6 +11,7 @@ type _Config struct {
 	AutoExit       bool
 	AutoLock       bool
 	AutoRun        bool
+	PrintLog       bool
 	logring        *ringbuf.Ringbuf
 }
 
@@ -23,6 +24,7 @@ var defaults _Config = _Config{
 	AutoRun:        true,
 	AutoExit:       false,
 	AutoLock:       false,
+	PrintLog:       false,
 }
 
 func init() {
