@@ -144,14 +144,16 @@ func (ac *Collection) runAgent(a Agent) {
 	meta.Started = time.Now()
 	meta.Status = AgentStatusRunning
 
-	switch meta.Role {
-	case AgentRoleSource:
-		ac.outputToRingbuf(a)
-	case AgentRoleErrors:
-		ac.errorsFromRingbuf(a)
-	case AgentRoleSink:
-		ac.inputFromRingbuf(a)
-	case AgentRoleLog:
-		ac.logFromRingbuf(a)
-	}
+	go func(ac *Collection, a Agent) {
+		switch meta.Role {
+		case AgentRoleSource:
+			ac.outputToRingbuf(a)
+		case AgentRoleErrors:
+			ac.errorsFromRingbuf(a)
+		case AgentRoleSink:
+			ac.inputFromRingbuf(a)
+		case AgentRoleLog:
+			ac.logFromRingbuf(a)
+		}
+	}(ac, a)
 }

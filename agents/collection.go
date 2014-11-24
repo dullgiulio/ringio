@@ -181,7 +181,7 @@ func (c *Collection) Run(autorun bool) {
 					meta := msg.agent.Meta()
 					msg.agent.Init()
 
-					go c.runAgent(msg.agent)
+					c.runAgent(msg.agent)
 
 					waitedAgents[meta.Role]++
 
@@ -206,14 +206,17 @@ func (c *Collection) Run(autorun bool) {
 				}
 			}
 
+			meta = realAgent.Meta()
+
 			if realAgent == nil {
 				msg.response.Err(errors.New("Agent not found"))
-			} else if meta.Status == AgentStatusRunning {
-				fmt.Printf("Collection cancel\n")
-				realAgent.Cancel()
-			}
+			} else {
+				if meta.Status == AgentStatusRunning {
+					realAgent.Cancel()
+				}
 
-			msg.response.Ok()
+				msg.response.Ok()
+			}
 		case agentMessageStatusCancel:
 			c.Close()
 			return
@@ -238,7 +241,7 @@ func (c *Collection) Run(autorun bool) {
 				if meta.Status == AgentStatusNone {
 					meta := a.Meta()
 
-					go c.runAgent(a)
+					c.runAgent(a)
 
 					waitedAgents[meta.Role]++
 				}
