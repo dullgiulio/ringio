@@ -208,10 +208,12 @@ func (c *Collection) Run(autorun bool) {
 
 			if realAgent == nil {
 				msg.response.Err(errors.New("Agent not found"))
-			} else {
+			} else if meta.Status == AgentStatusRunning {
+				fmt.Printf("Collection cancel\n")
 				realAgent.Cancel()
-				msg.response.Ok()
 			}
+
+			msg.response.Ok()
 		case agentMessageStatusCancel:
 			c.Close()
 			return
