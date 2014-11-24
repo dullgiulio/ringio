@@ -158,7 +158,8 @@ func (s *RpcServer) Close(req *RpcReq, result *RpcResp) error {
 
 	*result = true
 
-	s.ac.Cancel()
+	s.ac.Cancel(&s.resp)
+	s.resp.Get()
 
 	s.mux.Unlock()
 

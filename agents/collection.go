@@ -63,8 +63,8 @@ func NewCollection() *Collection {
 	}
 }
 
-func (c *Collection) Cancel() {
-	c.requestCh <- newAgentMessage(agentMessageStatusCancel, nil, nil)
+func (c *Collection) Cancel(response AgentMessageResponse) {
+	c.requestCh <- newAgentMessage(agentMessageStatusCancel, response, nil)
 }
 
 func (c *Collection) Done() {
@@ -218,7 +218,16 @@ func (c *Collection) Run(autorun bool) {
 				msg.response.Ok()
 			}
 		case agentMessageStatusCancel:
+			// Kill all outstanding processes.
+			for _, a := range c.agents {
+				if a.Meta().Status == AgentStatusRunning {
+					a.Cancel()
+					<-c.requestCh
+				}
+			}
+
 			c.Close()
+			msg.response.Ok()
 			return
 		case agentMessageStatusDone:
 			log.Debug(log.FacilityAgent, "Adding agents has been disabled")
