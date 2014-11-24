@@ -50,9 +50,7 @@ func (a *AgentCmd) Cancel() error {
 		a.cancel <- true
 	}
 
-	a.cmd.Process.Kill()
-
-	return nil
+	return a.cmd.Process.Kill()
 }
 
 func (a *AgentCmd) OutputToRingbuf(errors, output *ringbuf.Ringbuf) {
@@ -85,9 +83,15 @@ func (a *AgentCmd) OutputToRingbuf(errors, output *ringbuf.Ringbuf) {
 
 	wg.Wait()
 
-	close(a.cancel)
+	// Close stdout to trigger a SIGPIPE on next write.
+	stderr.Close()
+	stdout.Close()
 
-	if err = a.cmd.Wait(); err != nil {
+	close(a.cancel)
+}
+
+func (a *AgentCmd) Stop() {
+	if err := a.cmd.Wait(); err != nil {
 		log.Error(log.FacilityAgent, err)
 	}
 }
@@ -131,8 +135,4 @@ func (a *AgentCmd) InputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) 
 	wg.Wait()
 
 	close(a.cancel)
-
-	if err = a.cmd.Wait(); err != nil {
-		log.Error(log.FacilityAgent, err)
-	}
 }

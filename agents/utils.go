@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/dullgiulio/ringio/msg"
 )
 
+// TODO: Must make this terminate somehow.
 func _writeToChan(c chan<- []byte, cancel chan bool, reader io.ReadCloser) {
 	scanner := bufio.NewScanner(reader)
 

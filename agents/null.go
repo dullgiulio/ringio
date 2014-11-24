@@ -40,6 +40,9 @@ func (a *AgentNull) Cancel() error {
 	return nil
 }
 
+func (a *AgentNull) Stop() {
+}
+
 func (a *AgentNull) OutputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	<-a.Kill
 }

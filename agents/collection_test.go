@@ -29,7 +29,8 @@ func TestAgentAdding(t *testing.T) {
 
 	resp.Get()
 
-	ac.Cancel()
+	ac.Cancel(&resp)
+	resp.Get()
 }
 
 // TODO: More tests using AgentNull

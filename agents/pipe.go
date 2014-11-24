@@ -66,7 +66,9 @@ func (a *AgentPipe) OutputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 	}
 
 	close(a.cancel)
+}
 
+func (a *AgentPipe) Stop() {
 	a.pipe.Close()
 }
 
@@ -78,6 +80,4 @@ func (a *AgentPipe) InputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf)
 	}
 
 	close(a.cancel)
-
-	a.pipe.Close()
 }

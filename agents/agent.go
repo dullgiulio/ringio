@@ -102,6 +102,7 @@ func (a *AgentDescr) Text() string {
 
 type Agent interface {
 	Init()
+	Stop()
 	Cancel() error
 	String() string
 	Meta() *AgentMetadata

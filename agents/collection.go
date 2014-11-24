@@ -2,6 +2,7 @@ package agents
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -157,6 +158,17 @@ func (c *Collection) Swap(i, j int) {
 	c.agents[i], c.agents[j] = c.agents[j], c.agents[i]
 }
 
+func (c *Collection) stopAgent(a Agent) {
+	if err := a.Cancel(); err != nil {
+		fmt.Printf("%s\n", err)
+		log.Error(log.FacilityAgent, err)
+		<-c.requestCh
+	} else {
+		<-c.requestCh
+		a.Stop()
+	}
+}
+
 func (c *Collection) Run(autorun bool) {
 	var addingLocked, sorted bool
 
@@ -212,7 +224,7 @@ func (c *Collection) Run(autorun bool) {
 				msg.response.Err(errors.New("Agent not found"))
 			} else {
 				if meta.Status == AgentStatusRunning {
-					realAgent.Cancel()
+					c.stopAgent(realAgent)
 				}
 
 				msg.response.Ok()
@@ -221,8 +233,7 @@ func (c *Collection) Run(autorun bool) {
 			// Kill all outstanding processes.
 			for _, a := range c.agents {
 				if a.Meta().Status == AgentStatusRunning {
-					a.Cancel()
-					<-c.requestCh
+					c.stopAgent(a)
 				}
 			}
 
