@@ -2,6 +2,8 @@
 
 Ringio (pronounced *ring-yo*) is a tool for creating dynamic data pipes. It is what you get when you mix "screen"/"tmux" with "tee".
 
+### Usage
+
   - Start a new ringio session
 ```
 #!sh

@@ -1,6 +1,8 @@
 * output 1 -> shows output from agent 1
 * error 1 -> shows errors from agent 1
 * errors -> shows all errors
+* ringio -ls -> dislays all sessions
+* ringio -k <session-name> -> forbicly remove a session socket
 
 * various flags, especially for main conf.
 
