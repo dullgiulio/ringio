@@ -57,6 +57,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 		"open":   Open,
 		"close":  Close,
 		"list":   List,
+		"ls":     List,
 		"stop":   Stop,
 		"set":    Set,
 	}
