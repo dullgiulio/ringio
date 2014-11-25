@@ -2,12 +2,15 @@ package msg
 
 import (
 	"testing"
+	"time"
 )
 
 func TestString(t *testing.T) {
-	m := Msg(0, []byte("Test message text to parse"))
-	if m.String() == "" {
-		t.Error("Did not expect a message to be empty")
+	m := Message{10, 1416926265, []byte("Some text here")}
+	mstr := m.String()
+
+	if mstr != "10 1416926265 Some text here" {
+		t.Error("Unexpected string format for Message")
 	}
 }
 
@@ -29,5 +32,35 @@ func TestFromString(t *testing.T) {
 
 	if string(m.data) != "Test message text to parse" {
 		t.Error("Expected data to be set correctly")
+	}
+}
+
+func TestTimestap(t *testing.T) {
+	ts := makeTimestamp() / 1000
+	tm := time.Unix(ts, 0)
+
+	if tm.After(time.Now()) {
+		t.Error("Time was given in the future")
+	}
+
+	if ts <= 1416926265 {
+		t.Error("Time was given before the test was written")
+	}
+}
+
+func TestCasting(t *testing.T) {
+	str := "some random string"
+	m := Cast([]byte(str))
+
+	if string(m.Data()) != str {
+		t.Error("Casting did not preserve data")
+	}
+
+	str = "some data"
+	m = Msg(2, []byte(str))
+	mc := Cast(m)
+
+	if string(mc.Data()) != str || mc.senderId != 2 {
+		t.Error("Casting did not preserve a Message")
 	}
 }

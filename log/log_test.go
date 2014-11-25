@@ -1,14 +1,56 @@
 package log
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 )
 
-func TestNullWriter(t *testing.T) {
-	n := new(NullWriter)
+func TestLogging(t *testing.T) {
+	var buf []byte
 
-	if l, err := n.Write([]byte("1234567890")); l != 10 || err != nil {
-		t.Log("Did expect to write 10 bytes and no error")
-		t.Fail()
+	b := bytes.NewBuffer(buf)
+	w := NewNewlineWriter(b)
+
+	AddWriter(w)
+
+	proceed := make(chan struct{})
+
+	go func() {
+		if !Run(LevelWarn) {
+			t.Error("Expected success after cancel")
+		}
+		proceed <- struct{}{}
+	}()
+
+	Debug(FacilityDefault, "Some debug message")
+	Info(FacilityDefault, "Some info message")
+	Cancel()
+
+	<-proceed
+
+	if b.String() != "" {
+		t.Error("Debug or info message written even when minimum is Warn.")
+	}
+
+	b.Reset()
+
+	go func() {
+		if Run(LevelWarn) {
+			t.Error("Expected run to return false after calling Fatal")
+		}
+		proceed <- struct{}{}
+	}()
+
+	Warn(FacilityDefault, "Some warn message")
+	Fatal(FacilityDefault, "Some fatal error")
+
+	<-proceed
+
+	s := b.String()
+
+	if !strings.Contains(s, "WARN: ringio: Some warn message") ||
+		!strings.Contains(s, "FAIL: ringio: Some fatal error") {
+		t.Error("Not all messages were correctly logged")
 	}
 }
