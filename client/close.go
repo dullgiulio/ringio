@@ -20,7 +20,7 @@ func NewCommandClose() *CommandClose {
 }
 
 func (c *CommandClose) Help() string {
-	return `Run all processes`
+	return `Close a session`
 }
 
 func (c *CommandClose) Init(fs *flag.FlagSet) error {
