@@ -57,7 +57,7 @@ func FromString(msg []byte) (Message, error) {
 func Cast(i interface{}) Message {
 	if m, ok := i.(Message); !ok {
 		if d, ok := i.([]byte); !ok {
-			panic("Cast to msg.Messsage failed")
+			panic("Cast to msg.Message failed")
 		} else {
 			return Msg(0, d)
 		}

@@ -11,18 +11,21 @@ import (
 var _dotfileDir string
 var _letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-")
 
+func getBasepath(home string) string {
+	if home == "" {
+		return path.Join("/tmp", ".ringio-"+os.Getenv("USER"))
+	} else {
+		return path.Join(home, ".ringio")
+	}
+}
+
 func getDotfileDir() string {
 	if _dotfileDir != "" {
 		return _dotfileDir
 	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	home := os.Getenv("HOME")
-	basepath := path.Join(home, ".ringio")
-
-	if home == "" {
-		basepath = path.Join("/tmp", ".ringio-"+os.Getenv("USER"))
-	}
+	basepath := getBasepath(os.Getenv("HOME"))
 
 	if os.MkdirAll(basepath, 0750) != nil {
 		panic("Unable to create directory for tagfile!")

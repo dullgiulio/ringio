@@ -71,7 +71,14 @@ func NewAgentMessageResponseBool() AgentMessageResponseBool {
 }
 
 func (r AgentMessageResponseBool) Get() (interface{}, error) {
-	return nil, <-r
+	err := <-r
+	val := false
+
+	if err == nil {
+		val = true
+	}
+
+	return val, err
 }
 
 func (r AgentMessageResponseBool) Ok() {

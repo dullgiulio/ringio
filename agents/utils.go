@@ -12,7 +12,7 @@ import (
 )
 
 // TODO: Must make this terminate somehow.
-func _writeToChan(c chan<- []byte, cancel chan bool, reader io.ReadCloser) {
+func writeToChan(c chan<- []byte, cancel chan bool, reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
@@ -25,8 +25,6 @@ func _writeToChan(c chan<- []byte, cancel chan bool, reader io.ReadCloser) {
 
 	log.Debug(log.FacilityAgent, "Writing into channel from input has terminated")
 
-	reader.Close()
-
 	close(c)
 }
 
@@ -37,7 +35,10 @@ func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel 
 
 	c := make(chan []byte)
 
-	go _writeToChan(c, cancel, reader)
+	go func() {
+		writeToChan(c, cancel, reader)
+		reader.Close()
+	}()
 
 	for {
 		select {

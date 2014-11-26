@@ -27,7 +27,7 @@ type RpcServer struct {
 func NewRpcServer(socket string, autorun bool) *RpcServer {
 	ac := agents.NewCollection()
 	s := &RpcServer{
-		socket:   utils.FileInDotpath(socket),
+		socket:   socket,
 		ac:       ac,
 		resp:     agents.NewAgentMessageResponseBool(),
 		actionCh: make(chan ServerAction),
@@ -59,7 +59,8 @@ func Init() {
 }
 
 func Run(sessionName string) (returnStatus int) {
-	s := NewRpcServer(sessionName, config.C.AutoRun)
+	socket := utils.FileInDotpath(sessionName)
+	s := NewRpcServer(socket, config.C.AutoRun)
 
 	// Serve RPC calls.
 	go s.serve()
@@ -98,6 +99,8 @@ func (s *RpcServer) Add(req *RpcReq, result *int) error {
 		s.ac.Add(agents.NewAgentPipe(ag.Args[0], ag.Meta.Role), resp)
 	case agents.AgentTypeCmd:
 		s.ac.Add(agents.NewAgentCmd(ag.Args, ag.Meta.Role), resp)
+	case agents.AgentTypeNull:
+		s.ac.Add(agents.NewAgentNull(0, ag.Meta.Role), resp)
 	}
 
 	i, err := resp.Get()
@@ -142,6 +145,10 @@ func (s *RpcServer) Stop(id int, result *RpcResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
+	if s.over {
+		return sessionOver
+	}
+
 	na := agents.NewAgentNull(id, agents.AgentRoleSink) // Role is unimportant here.
 	s.ac.SetAgentStatusKill(na, &s.resp)
 	s.resp.Get()
@@ -152,6 +159,11 @@ func (s *RpcServer) Stop(id int, result *RpcResp) error {
 
 func (s *RpcServer) Close(req *RpcReq, result *RpcResp) error {
 	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	if s.over {
+		return sessionOver
+	}
 
 	// This session has terminated.
 	s.over = true
@@ -161,11 +173,8 @@ func (s *RpcServer) Close(req *RpcReq, result *RpcResp) error {
 	s.ac.Cancel(&s.resp)
 	s.resp.Get()
 
-	s.mux.Unlock()
+	onexit.PendingExit(0)
 
-	onexit.PendingExit(1)
-
-	// Should be reached.
 	return nil
 }
 

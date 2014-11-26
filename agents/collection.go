@@ -167,6 +167,10 @@ func (c *Collection) stopAgent(a Agent) {
 		<-c.requestCh
 		a.Stop()
 	}
+
+	meta := a.Meta()
+	meta.Finished = time.Now()
+	meta.Status = AgentStatusFinished
 }
 
 func (c *Collection) Run(autorun bool) {
@@ -245,6 +249,7 @@ func (c *Collection) Run(autorun bool) {
 			addingLocked = true
 		case agentMessageStatusAutorun:
 			if autorun {
+				msg.response.Ok()
 				continue
 			}
 
