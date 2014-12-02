@@ -108,7 +108,7 @@ func (c *Collection) Reader(which CollectionRingType) <-chan interface{} {
 		r = c.output
 	}
 
-	reader := ringbuf.NewRingbufReader(r)
+	reader := ringbuf.NewReader(r)
 	return reader.ReadCh()
 }
 

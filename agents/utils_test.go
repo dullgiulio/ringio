@@ -72,7 +72,7 @@ func TestWriteToRingbuf(t *testing.T) {
 
 	ring.Eof()
 
-	reader := ringbuf.NewRingbufReader(ring)
+	reader := ringbuf.NewReader(ring)
 	readCh := reader.ReadCh()
 	i := 0
 

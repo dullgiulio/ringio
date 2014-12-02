@@ -91,7 +91,7 @@ func readFromRingbuf(writer io.WriteCloser, ring *ringbuf.Ringbuf, cancel <-chan
 		defer wg.Done()
 	}
 
-	reader := ringbuf.NewRingbufReader(ring)
+	reader := ringbuf.NewReader(ring)
 	output := bufio.NewWriter(writer)
 	c := reader.ReadCh()
 
