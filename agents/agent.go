@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/config"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/config"
 )
 
 type AgentType int

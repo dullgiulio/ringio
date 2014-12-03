@@ -6,11 +6,11 @@ import (
 	"net/rpc"
 	"os"
 
-	"bitbucket.org/dullgiulio/ringio/agents"
-	"bitbucket.org/dullgiulio/ringio/onexit"
-	"bitbucket.org/dullgiulio/ringio/pipe"
-	"bitbucket.org/dullgiulio/ringio/server"
-	"bitbucket.org/dullgiulio/ringio/utils"
+	"github.com/dullgiulio/ringio/agents"
+	"github.com/dullgiulio/ringio/onexit"
+	"github.com/dullgiulio/ringio/pipe"
+	"github.com/dullgiulio/ringio/server"
+	"github.com/dullgiulio/ringio/utils"
 )
 
 func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName string) {

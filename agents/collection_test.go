@@ -3,8 +3,8 @@ package agents
 import (
 	"testing"
 
-	"bitbucket.org/dullgiulio/ringio/config"
-	"bitbucket.org/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/config"
+	"github.com/dullgiulio/ringio/log"
 )
 
 func readLogs(t *testing.T) {

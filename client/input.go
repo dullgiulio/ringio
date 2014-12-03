@@ -4,8 +4,8 @@ import (
 	"flag"
 	"net/rpc"
 
-	"bitbucket.org/dullgiulio/ringio/server"
-	"bitbucket.org/dullgiulio/ringio/utils"
+	"github.com/dullgiulio/ringio/server"
+	"github.com/dullgiulio/ringio/utils"
 )
 
 type CommandInput struct {

@@ -1,8 +1,8 @@
 package agents
 
 import (
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/pipe"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/pipe"
 )
 
 type AgentPipe struct {

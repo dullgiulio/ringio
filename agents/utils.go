@@ -6,9 +6,9 @@ import (
 	"io"
 	"sync"
 
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/log"
-	"bitbucket.org/dullgiulio/ringio/msg"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/msg"
 )
 
 // TODO: Must make this terminate somehow.

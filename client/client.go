@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/rpc"
 
-	"bitbucket.org/dullgiulio/ringio/utils"
+	"github.com/dullgiulio/ringio/utils"
 )
 
 type Command int

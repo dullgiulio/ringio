@@ -5,7 +5,7 @@ import (
 	"os"
 	"syscall"
 
-	"bitbucket.org/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/log"
 )
 
 type Pipe struct {

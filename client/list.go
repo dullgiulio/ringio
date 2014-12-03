@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/rpc"
 
-	"bitbucket.org/dullgiulio/ringio/agents"
-	"bitbucket.org/dullgiulio/ringio/server"
-	"bitbucket.org/dullgiulio/ringio/utils"
+	"github.com/dullgiulio/ringio/agents"
+	"github.com/dullgiulio/ringio/server"
+	"github.com/dullgiulio/ringio/utils"
 )
 
 type CommandList struct {

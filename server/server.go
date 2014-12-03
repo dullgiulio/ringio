@@ -7,12 +7,12 @@ import (
 	"os"
 	"sync"
 
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/agents"
-	"bitbucket.org/dullgiulio/ringio/config"
-	"bitbucket.org/dullgiulio/ringio/log"
-	"bitbucket.org/dullgiulio/ringio/onexit"
-	"bitbucket.org/dullgiulio/ringio/utils"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/agents"
+	"github.com/dullgiulio/ringio/config"
+	"github.com/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/onexit"
+	"github.com/dullgiulio/ringio/utils"
 )
 
 type RpcServer struct {

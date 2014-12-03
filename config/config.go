@@ -1,7 +1,7 @@
 package config
 
 import (
-	"bitbucket.org/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringbuf"
 )
 
 type _Config struct {

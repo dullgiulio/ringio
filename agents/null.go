@@ -1,7 +1,7 @@
 package agents
 
 import (
-	"bitbucket.org/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringbuf"
 )
 
 type AgentNull struct {

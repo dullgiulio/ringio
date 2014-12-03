@@ -6,8 +6,8 @@ import (
 	"net/rpc"
 	"strconv"
 
-	"bitbucket.org/dullgiulio/ringio/server"
-	"bitbucket.org/dullgiulio/ringio/utils"
+	"github.com/dullgiulio/ringio/server"
+	"github.com/dullgiulio/ringio/utils"
 )
 
 type CommandStop struct {

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/log"
 )
 
 func TestCreatePipe(t *testing.T) {

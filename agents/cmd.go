@@ -5,8 +5,8 @@ import (
 	"strings"
 	"sync"
 
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/log"
 )
 
 type AgentCmd struct {

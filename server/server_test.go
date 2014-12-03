@@ -3,9 +3,9 @@ package server
 import (
 	"testing"
 
-	"bitbucket.org/dullgiulio/ringio/agents"
-	"bitbucket.org/dullgiulio/ringio/log"
-	"bitbucket.org/dullgiulio/ringio/onexit"
+	"github.com/dullgiulio/ringio/agents"
+	"github.com/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/onexit"
 )
 
 func TestRpcServer(t *testing.T) {

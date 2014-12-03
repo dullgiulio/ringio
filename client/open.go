@@ -3,7 +3,7 @@ package client
 import (
 	"flag"
 
-	"bitbucket.org/dullgiulio/ringio/server"
+	"github.com/dullgiulio/ringio/server"
 )
 
 type CommandOpen struct {

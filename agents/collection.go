@@ -6,9 +6,9 @@ import (
 	"sort"
 	"time"
 
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/config"
-	"bitbucket.org/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/config"
+	"github.com/dullgiulio/ringio/log"
 )
 
 type CollectionRingType int

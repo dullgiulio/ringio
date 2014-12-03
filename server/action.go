@@ -1,8 +1,8 @@
 package server
 
 import (
-	"bitbucket.org/dullgiulio/ringio/agents"
-	"bitbucket.org/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/agents"
+	"github.com/dullgiulio/ringio/log"
 )
 
 const (

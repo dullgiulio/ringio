@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"bitbucket.org/dullgiulio/ringbuf"
-	"bitbucket.org/dullgiulio/ringio/msg"
+	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/msg"
 )
 
 func TestWriteToChan(t *testing.T) {
