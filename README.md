@@ -5,35 +5,25 @@ Ringio (pronounced *ring-yo*) is a tool for creating dynamic data pipes. It is w
 ### Usage
 
   - Start a new ringio session
-```
-#!sh
-
+```bash
 $ ringio web-logs open &
 ```
   - Add some input agents
-```
-#!sh
-
+```bash
 $ ringio web-logs input tail -f /var/log/httpd/access_log
 ```
   - Add some output agents or get output on the terminal
-```
-#!sh
-
+```bash
 $ ringio web-logs output ./count-useragents
 $ ringio web-logs output ./count-pagehits
 $ ringio web-logs output # Will print to the console.
 ```
   - List agents for a session:
-```
-#!sh
-
+```bash
 $ ringio web-logs list
 ```
   - Close the session.
-```
-#!sh
-
+```bash
 $ ringio web-logs close
 ```
 
@@ -41,9 +31,7 @@ $ ringio web-logs close
 
 You need the Go lang development environment installed and set up:
 
-```
-#!sh
-
+```bash
 $ go build bitbucket.org/dullgiulio/ringio
 ```
 
