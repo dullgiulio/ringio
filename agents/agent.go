@@ -41,14 +41,14 @@ func (s AgentStatus) IsFinished() bool {
 func (s AgentStatus) String() string {
 	switch s {
 	case AgentStatusRunning:
-		return "running"
+		return "R"
 	case AgentStatusKill:
-		return "killed"
+		return "F"
 	case AgentStatusFinished:
-		return "finished"
+		return "F"
 	}
 
-	return "unknown"
+	return "?"
 }
 
 type AgentMetadata struct {
@@ -68,7 +68,7 @@ type AgentDescr struct {
 func (a *AgentDescr) String() string {
 	var args string
 
-	flow := "[ring] ->"
+	flow := "->"
 
 	if a.Type == AgentTypeCmd {
 		args = strings.Join(a.Args, " ")
@@ -77,10 +77,10 @@ func (a *AgentDescr) String() string {
 	}
 
 	if a.Meta.Role == AgentRoleSource {
-		flow = "[ring] <-"
+		flow = "<-"
 	}
 
-	return fmt.Sprintf("%d %s: %s %s",
+	return fmt.Sprintf("%d %s %s %s",
 		a.Meta.Id, a.Meta.Status.String(), flow, args)
 }
 
