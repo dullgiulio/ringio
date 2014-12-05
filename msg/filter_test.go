@@ -33,8 +33,14 @@ func TestFilter(t *testing.T) {
 
 	f := NewFilter()
 	// Both filtered in and out, is not allowed.
+	f.Out(2)
 	f.Out(1)
+	f.In(2)
 	f.In(1)
+
+	if f.String() != "1,2,-1,-2" {
+		t.Error("Unexpected string representation")
+	}
 
 	if m.Allowed(f) {
 		t.Error("Did not expect message to be allowed")
@@ -44,6 +50,10 @@ func TestFilter(t *testing.T) {
 	// Filtered in must be allowed.
 	f.In(1)
 
+	if f.String() != "1" {
+		t.Error("Unexpected string representation")
+	}
+
 	if !m.Allowed(f) {
 		t.Error("Did not expect message to be disallowed")
 	}
@@ -51,6 +61,10 @@ func TestFilter(t *testing.T) {
 	f = NewFilter()
 	// Filtered out, but not this one.
 	f.Out(10)
+
+	if f.String() != "-10" {
+		t.Error("Unexpected string representation")
+	}
 
 	if !m.Allowed(f) {
 		t.Error("Did not expect message to be disallowed")
