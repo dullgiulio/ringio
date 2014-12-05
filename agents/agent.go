@@ -7,6 +7,7 @@ import (
 
 	"github.com/dullgiulio/ringbuf"
 	"github.com/dullgiulio/ringio/config"
+	"github.com/dullgiulio/ringio/msg"
 )
 
 type AgentType int
@@ -57,12 +58,14 @@ type AgentMetadata struct {
 	Status   AgentStatus
 	Started  time.Time
 	Finished time.Time
+	Filter   *msg.Filter
 }
 
 type AgentDescr struct {
-	Args []string
-	Meta AgentMetadata
-	Type AgentType
+	Args   []string
+	Meta   AgentMetadata
+	Type   AgentType
+	Filter *msg.Filter
 }
 
 func (a *AgentDescr) String() string {
@@ -78,6 +81,11 @@ func (a *AgentDescr) String() string {
 
 	if a.Meta.Role == AgentRoleSource {
 		flow = "<-"
+	}
+
+	if a.Meta.Role == AgentRoleSink &&
+		a.Meta.Filter != nil {
+		flow = fmt.Sprintf("-> [%s]", a.Meta.Filter.String())
 	}
 
 	return fmt.Sprintf("%d %s %s %s",
