@@ -7,6 +7,7 @@ import (
 
 	"github.com/dullgiulio/ringbuf"
 	"github.com/dullgiulio/ringio/log"
+	"github.com/dullgiulio/ringio/msg"
 )
 
 type AgentCmd struct {
@@ -96,7 +97,7 @@ func (a *AgentCmd) Stop() {
 	}
 }
 
-func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
+func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
 	stdout, err := a.cmd.StdoutPipe()
 
 	if err != nil {
@@ -130,7 +131,7 @@ func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf)
 
 	go writeToRingbuf(id, stdout, rStdout, a.cancel, wg)
 	go writeToRingbuf(id, stderr, rErrors, a.cancel, wg)
-	go readFromRingbuf(stdin, rOutput, a.cancel, wg)
+	go readFromRingbuf(stdin, filter, rOutput, a.cancel, wg)
 
 	wg.Wait()
 

@@ -2,6 +2,7 @@ package agents
 
 import (
 	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/msg"
 	"github.com/dullgiulio/ringio/pipe"
 )
 
@@ -72,10 +73,8 @@ func (a *AgentPipe) Stop() {
 	a.pipe.Close()
 }
 
-func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
-	// if a.meta.filterIn, a.meta.filterOut
-
-	cancelled := readFromRingbuf(a.pipe, rOutput, a.cancel, nil)
+func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
+	cancelled := readFromRingbuf(a.pipe, filter, rOutput, a.cancel, nil)
 
 	if !cancelled {
 		<-a.cancel

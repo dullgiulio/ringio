@@ -2,6 +2,7 @@ package agents
 
 import (
 	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/msg"
 )
 
 type AgentNull struct {
@@ -47,6 +48,6 @@ func (a *AgentNull) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	<-a.Kill
 }
 
-func (a *AgentNull) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
+func (a *AgentNull) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
 	<-a.Kill
 }
