@@ -53,7 +53,7 @@ func (a *AgentCmd) Cancel() error {
 	return a.cmd.Process.Kill()
 }
 
-func (a *AgentCmd) OutputToRingbuf(errors, output *ringbuf.Ringbuf) {
+func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	stdout, err := a.cmd.StdoutPipe()
 
 	if err != nil {
@@ -96,7 +96,7 @@ func (a *AgentCmd) Stop() {
 	}
 }
 
-func (a *AgentCmd) InputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
+func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
 	stdout, err := a.cmd.StdoutPipe()
 
 	if err != nil {

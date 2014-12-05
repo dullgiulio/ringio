@@ -43,10 +43,10 @@ func (a *AgentNull) Cancel() error {
 func (a *AgentNull) Stop() {
 }
 
-func (a *AgentNull) OutputToRingbuf(errors, output *ringbuf.Ringbuf) {
+func (a *AgentNull) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	<-a.Kill
 }
 
-func (a *AgentNull) InputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
+func (a *AgentNull) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
 	<-a.Kill
 }

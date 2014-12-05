@@ -107,8 +107,8 @@ type Agent interface {
 	String() string
 	Meta() *AgentMetadata
 	Descr() AgentDescr
-	OutputToRingbuf(errors, output *ringbuf.Ringbuf)
-	InputFromRingbuf(stdout, errors, output *ringbuf.Ringbuf)
+	InputToRingbuf(errors, output *ringbuf.Ringbuf)
+	OutputFromRingbuf(stdout, errors, output *ringbuf.Ringbuf)
 }
 
 func (ac *Collection) _responseOk(a Agent) {
@@ -117,26 +117,26 @@ func (ac *Collection) _responseOk(a Agent) {
 	resp.Get()
 }
 
-func (ac *Collection) outputToRingbuf(a Agent) {
-	a.OutputToRingbuf(ac.errors, ac.output)
+func (ac *Collection) inputToRingbuf(a Agent) {
+	a.InputToRingbuf(ac.errors, ac.output)
 	ac._responseOk(a)
 }
 
-func (ac *Collection) inputFromRingbuf(a Agent) {
-	a.InputFromRingbuf(ac.stdout, ac.errors, ac.output)
+func (ac *Collection) outputFromRingbuf(a Agent) {
+	a.OutputFromRingbuf(ac.stdout, ac.errors, ac.output)
 	ac._responseOk(a)
 }
 
 func (ac *Collection) errorsFromRingbuf(a Agent) {
 	// We both read and write on errors.
-	a.InputFromRingbuf(ac.errors, ac.errors, ac.errors)
+	a.OutputFromRingbuf(ac.errors, ac.errors, ac.errors)
 	ac._responseOk(a)
 }
 
 func (ac *Collection) logFromRingbuf(a Agent) {
 	logring := config.GetLogRingbuf()
 
-	a.InputFromRingbuf(logring, logring, logring)
+	a.OutputFromRingbuf(logring, logring, logring)
 	ac._responseOk(a)
 }
 
@@ -148,11 +148,11 @@ func (ac *Collection) runAgent(a Agent) {
 	go func(ac *Collection, a Agent) {
 		switch meta.Role {
 		case AgentRoleSource:
-			ac.outputToRingbuf(a)
+			ac.inputToRingbuf(a)
 		case AgentRoleErrors:
 			ac.errorsFromRingbuf(a)
 		case AgentRoleSink:
-			ac.inputFromRingbuf(a)
+			ac.outputFromRingbuf(a)
 		case AgentRoleLog:
 			ac.logFromRingbuf(a)
 		}

@@ -50,7 +50,7 @@ func (a *AgentPipe) Cancel() error {
 	return nil
 }
 
-func (a *AgentPipe) OutputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
+func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 	if ok := a.pipe.OpenRead(); !ok {
 		return
 	}
@@ -72,7 +72,9 @@ func (a *AgentPipe) Stop() {
 	a.pipe.Close()
 }
 
-func (a *AgentPipe) InputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
+func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf) {
+	// if a.meta.filterIn, a.meta.filterOut
+
 	cancelled := readFromRingbuf(a.pipe, rOutput, a.cancel, nil)
 
 	if !cancelled {
