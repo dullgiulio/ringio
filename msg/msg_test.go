@@ -64,3 +64,21 @@ func TestCasting(t *testing.T) {
 		t.Error("Casting did not preserve a Message")
 	}
 }
+
+func TestInvalid(t *testing.T) {
+	str := []byte("no string But string was expected")
+	_, err := FromString(str)
+
+	if err == nil {
+		t.Error("Expected error after passing invalid message")
+	}
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("Expected panic()")
+		}
+	}()
+
+	// Will trigger a panic.
+	Cast(interface{}(NewFilter()))
+}
