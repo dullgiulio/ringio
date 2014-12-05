@@ -29,7 +29,11 @@ func TestNewFilter(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	m := Msg(1, []byte("Test message"))
+    m := Msg(1, []byte("Test message"))
+
+    if !m.Allowed(nil) {
+        t.Error("Allowed returned false on nil filter")
+    }
 
 	f := NewFilter()
 	// Both filtered in and out, is not allowed.

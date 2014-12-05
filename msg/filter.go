@@ -69,7 +69,11 @@ func (f *Filter) String() string {
 }
 
 func (m *Message) Allowed(f *Filter) bool {
-	id := m.senderId
+	if f == nil {
+        return true
+    }
+    
+    id := m.senderId
 
 	if len(f.out) > 0 {
 		for _, out := range f.out {
