@@ -5,7 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"net/rpc"
+	"strconv"
 
+	"github.com/dullgiulio/ringio/msg"
 	"github.com/dullgiulio/ringio/utils"
 )
 
@@ -37,6 +39,7 @@ type Cli struct {
 	Session    string
 	Command    Command
 	CommandStr string
+	Filter     *msg.Filter
 	argsLen    int
 	flagset    *flag.FlagSet
 	client     Client
@@ -82,6 +85,8 @@ func (cli *Cli) ParseArgs(args []string) error {
 		return err
 	}
 
+	cli.Filter = cli.parseFilter(cli.NArgs)
+
 	if err := cli.flagset.Parse(cli.NArgs); err != nil {
 		return err
 	}
@@ -93,6 +98,34 @@ func (cli *Cli) ParseArgs(args []string) error {
 	cli.NArgs = cli.NArgs[0 : len(cli.NArgs)-n]
 
 	return nil
+}
+
+func (cli *Cli) parseFilter(args []string) (f *msg.Filter) {
+	skipped := 0
+
+	for i := range args {
+		if d, err := strconv.Atoi(args[i]); err == nil {
+			if skipped == 0 {
+				f = msg.NewFilter()
+			}
+
+			if d < 0 {
+				f.Out(-d)
+			} else {
+				f.In(d)
+			}
+
+			skipped++
+		} else {
+			break
+		}
+	}
+
+	if skipped > 0 {
+		cli.NArgs = cli.NArgs[skipped:]
+	}
+
+	return
 }
 
 func (cli *Cli) getClient() Client {

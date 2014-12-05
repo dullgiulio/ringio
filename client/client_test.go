@@ -47,6 +47,36 @@ func TestArgsParsing(t *testing.T) {
 	}
 }
 
+func TestFilterArgs(t *testing.T) {
+	cli := NewCli()
+	err := cli.ParseArgs([]string{"ringio", "session-name", "output", "1", "-2", "4", "-3", "command", "cmdarg"})
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	if cli.Session != "session-name" {
+		t.Error("Expected 'session-name' as session name")
+	}
+
+	if cli.CommandStr != "output" {
+		t.Error("Expected 'input' as command name")
+	}
+
+	if cli.Filter.String() != "1,4,-2,-3" {
+		t.Error("Expected '1,4,-2,-3' as filter")
+	}
+
+	if cli.Args[0] != "command" {
+		t.Error("Args don't start properly")
+	}
+
+	if cli.Args[1] != "cmdarg" {
+		t.Error("Args don't finish properly")
+	}
+}
+
 func TestCorrectClient(t *testing.T) {
 	cli := NewCli()
 	c := cli.getClient()
