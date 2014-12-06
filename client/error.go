@@ -31,7 +31,7 @@ func (c *CommandError) Init(fs *flag.FlagSet) error {
 func (c *CommandError) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-    addErrorsAgentPipe(c.client, cli.Filter, c.response, utils.GetRandomDotfile())
+	addErrorsAgentPipe(c.client, cli.Filter, c.response, utils.GetRandomDotfile())
 
 	return nil
 }
