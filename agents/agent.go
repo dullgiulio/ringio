@@ -62,10 +62,9 @@ type AgentMetadata struct {
 }
 
 type AgentDescr struct {
-	Args   []string
-	Meta   AgentMetadata
-	Type   AgentType
-	Filter *msg.Filter
+	Args []string
+	Meta AgentMetadata
+	Type AgentType
 }
 
 func (a *AgentDescr) String() string {

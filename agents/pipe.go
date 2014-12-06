@@ -12,10 +12,10 @@ type AgentPipe struct {
 	cancel chan bool
 }
 
-func NewAgentPipe(pipeName string, role AgentRole) *AgentPipe {
+func NewAgentPipe(pipeName string, role AgentRole, filter *msg.Filter) *AgentPipe {
 	return &AgentPipe{
 		pipe:   pipe.New(pipeName),
-		meta:   &AgentMetadata{Role: role},
+		meta:   &AgentMetadata{Role: role, Filter: filter},
 		cancel: make(chan bool),
 	}
 }

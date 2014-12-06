@@ -32,9 +32,9 @@ func (c *CommandOutput) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
 	if len(cli.Args) == 0 {
-		addSinkAgentPipe(c.client, c.response, utils.GetRandomDotfile())
+		addSinkAgentPipe(c.client, cli.Filter, c.response, utils.GetRandomDotfile())
 	} else {
-		addSinkAgentCmd(c.client, c.response, cli.Args)
+		addSinkAgentCmd(c.client, cli.Filter, c.response, cli.Args)
 	}
 
 	return nil

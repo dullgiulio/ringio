@@ -16,10 +16,10 @@ type AgentCmd struct {
 	cancel chan bool
 }
 
-func NewAgentCmd(cmd []string, role AgentRole) *AgentCmd {
+func NewAgentCmd(cmd []string, role AgentRole, filter *msg.Filter) *AgentCmd {
 	return &AgentCmd{
 		cmd:    exec.Command(cmd[0], cmd[1:]...),
-		meta:   &AgentMetadata{Role: role},
+		meta:   &AgentMetadata{Role: role, Filter: filter},
 		cancel: make(chan bool),
 	}
 }

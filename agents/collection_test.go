@@ -29,7 +29,7 @@ func TestAgentAdding(t *testing.T) {
 		proceed <- struct{}{}
 	}()
 
-	a0 := NewAgentNull(0, AgentRoleSource)
+	a0 := NewAgentNull(0, AgentRoleSource, nil)
 	resp := NewAgentMessageResponseBool()
 
 	ac.Add(a0, &resp)
@@ -58,7 +58,7 @@ func TestAgentAdding(t *testing.T) {
 		t.Error("Expected finish time to be still undefined")
 	}
 
-	a1 := NewAgentNull(0, AgentRoleSource)
+	a1 := NewAgentNull(0, AgentRoleSource, nil)
 	resp = NewAgentMessageResponseBool()
 
 	ac.Add(a1, &resp)
@@ -154,7 +154,7 @@ func TestInvalidActions(t *testing.T) {
 
 	resp := NewAgentMessageResponseBool()
 
-	agent := NewAgentNull(0, AgentRoleSink)
+	agent := NewAgentNull(0, AgentRoleSink, nil)
 
 	ac.Done()
 	ac.Add(agent, &resp)

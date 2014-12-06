@@ -32,7 +32,7 @@ func (c *CommandIO) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
 	go addSourceAgentPipe(c.client, c.response, utils.GetRandomDotfile())
-	addSinkAgentPipe(c.client, c.response, utils.GetRandomDotfile())
+	addSinkAgentPipe(c.client, cli.Filter, c.response, utils.GetRandomDotfile())
 
 	return nil
 }

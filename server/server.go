@@ -96,11 +96,11 @@ func (s *RpcServer) Add(req *RpcReq, result *int) error {
 
 	switch ag.Type {
 	case agents.AgentTypePipe:
-		s.ac.Add(agents.NewAgentPipe(ag.Args[0], ag.Meta.Role), resp)
+		s.ac.Add(agents.NewAgentPipe(ag.Args[0], ag.Meta.Role, ag.Meta.Filter), resp)
 	case agents.AgentTypeCmd:
-		s.ac.Add(agents.NewAgentCmd(ag.Args, ag.Meta.Role), resp)
+		s.ac.Add(agents.NewAgentCmd(ag.Args, ag.Meta.Role, ag.Meta.Filter), resp)
 	case agents.AgentTypeNull:
-		s.ac.Add(agents.NewAgentNull(0, ag.Meta.Role), resp)
+		s.ac.Add(agents.NewAgentNull(0, ag.Meta.Role, ag.Meta.Filter), resp)
 	}
 
 	i, err := resp.Get()
@@ -149,7 +149,7 @@ func (s *RpcServer) Stop(id int, result *RpcResp) error {
 		return sessionOver
 	}
 
-	na := agents.NewAgentNull(id, agents.AgentRoleSink) // Role is unimportant here.
+	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
 	s.ac.SetAgentStatusKill(na, &s.resp)
 	s.resp.Get()
 
