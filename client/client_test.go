@@ -49,7 +49,7 @@ func TestArgsParsing(t *testing.T) {
 
 func TestFilterArgs(t *testing.T) {
 	cli := NewCli()
-	err := cli.ParseArgs([]string{"ringio", "session-name", "output", "1", "-2", "4", "-3", "command", "cmdarg"})
+	err := cli.ParseArgs([]string{"ringio", "session-name", "output", "%1", "%-2", "4", "-3", "command", "cmdarg"})
 
 	if err != nil {
 		t.Error(err)

@@ -18,7 +18,8 @@ const (
 	Output
 	Input
 	IO
-	Log
+	Error
+    Log
 	Run
 	Open
 	Close
@@ -55,7 +56,10 @@ func (cli *Cli) ParseArgs(args []string) error {
 		"in":     Input,
 		"output": Output,
 		"out":    Output,
-		"log":    Log,
+        "errors": Error,
+        "error":  Error,
+        "err":    Error,
+        "log":    Log,
 		"run":    Run,
 		"open":   Open,
 		"close":  Close,
@@ -104,7 +108,13 @@ func (cli *Cli) parseFilter(args []string) (f *msg.Filter) {
 	skipped := 0
 
 	for i := range args {
-		if d, err := strconv.Atoi(args[i]); err == nil {
+        arg := args[i]
+
+		if args[i][0] == '%' {
+            arg = args[i][1:]
+        }
+        
+        if d, err := strconv.Atoi(arg); err == nil {
 			if skipped == 0 {
 				f = msg.NewFilter()
 			}
@@ -140,7 +150,9 @@ func (cli *Cli) getClient() Client {
 		return NewCommandInput()
 	case IO:
 		return NewCommandIO()
-	case Log:
+    case Error:
+        return NewCommandError()
+    case Log:
 		return NewCommandLog()
 	case Run:
 		return NewCommandRun()
