@@ -129,8 +129,87 @@ func (ac *Collection) inputToRingbuf(a Agent) {
 	ac._responseOk(a)
 }
 
+func (ac *Collection) isFilteringSinkAgents(filter *msg.Filter) bool {
+	if filter == nil {
+		return false
+	}
+
+	fin := filter.GetIn()
+	haveSinks := false
+
+	if len(fin) == 0 {
+		return false
+	}
+
+	// XXX: Unsafe access of ac.agents. Unlikely but possible race condition.
+	for _, a := range ac.agents {
+		meta := a.Meta()
+
+		if meta.Role == AgentRoleSink {
+			for _, id := range fin {
+				if meta.Id == id {
+					return true
+				}
+			}
+
+			haveSinks = true
+		}
+	}
+
+	if haveSinks {
+		return false
+	}
+
+	return true
+}
+
+func (ac *Collection) validateFilter(self int, filter *msg.Filter) error {
+	if filter == nil {
+		return nil
+	}
+
+	fin := filter.GetIn()
+	fout := filter.GetOut()
+
+	agentIds := make(map[int]struct{})
+
+	for i := 0; i < len(ac.agents); i++ {
+		a := ac.agents[i]
+		meta := a.Meta()
+
+		agentIds[meta.Id] = struct{}{}
+	}
+
+	for _, id := range fin {
+		if _, ok := agentIds[id]; !ok {
+			return fmt.Errorf("%%%d is not a valid agent", id)
+		}
+
+		if id == self {
+			return fmt.Errorf("Cannot filter in the agent itself")
+		}
+	}
+
+	for _, id := range fout {
+		if _, ok := agentIds[id]; !ok {
+			return fmt.Errorf("%%%d is not a valid agent", id)
+		}
+
+		if id == self {
+			return fmt.Errorf("Cannot filter out the agent itself")
+		}
+	}
+
+	return nil
+}
+
 func (ac *Collection) outputFromRingbuf(a Agent, filter *msg.Filter) {
-	a.OutputFromRingbuf(ac.stdout, ac.errors, ac.output, filter)
+	if ac.isFilteringSinkAgents(filter) {
+		a.OutputFromRingbuf(ac.stdout, ac.errors, ac.stdout, filter)
+	} else {
+		a.OutputFromRingbuf(ac.stdout, ac.errors, ac.output, filter)
+	}
+
 	ac._responseOk(a)
 }
 
@@ -147,8 +226,15 @@ func (ac *Collection) logFromRingbuf(a Agent) {
 	ac._responseOk(a)
 }
 
-func (ac *Collection) runAgent(a Agent) {
+func (ac *Collection) runAgent(a Agent) error {
 	meta := a.Meta()
+
+	// Notice that this validation doesn't make safe access to ac:
+	// it is safe to call it here, but not an a go routine.
+	if err := ac.validateFilter(meta.Id, meta.Filter); err != nil {
+		return err
+	}
+
 	meta.Started = time.Now()
 	meta.Status = AgentStatusRunning
 
@@ -164,4 +250,6 @@ func (ac *Collection) runAgent(a Agent) {
 			ac.logFromRingbuf(a)
 		}
 	}(ac, a)
+
+	return nil
 }

@@ -33,7 +33,9 @@ func TestAgentAdding(t *testing.T) {
 	resp := NewAgentMessageResponseBool()
 
 	ac.Add(a0, &resp)
-	resp.Get()
+	if _, err := resp.Get(); err != nil {
+		t.Error(err)
+	}
 
 	meta := a0.Meta()
 

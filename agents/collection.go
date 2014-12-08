@@ -2,7 +2,6 @@ package agents
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 	"time"
 
@@ -160,7 +159,6 @@ func (c *Collection) Swap(i, j int) {
 
 func (c *Collection) stopAgent(a Agent) {
 	if err := a.Cancel(); err != nil {
-		fmt.Printf("%s\n", err)
 		log.Error(log.FacilityAgent, err)
 		<-c.requestCh
 	} else {
@@ -185,31 +183,35 @@ func (c *Collection) Run(autorun bool) {
 	for msg := range c.requestCh {
 		switch msg.status {
 		case agentMessageStatusAdd:
-			if !addingLocked {
-				// Will need to sort elements again.
-				sorted = false
-
-				id := c.add(msg.agent)
-
-				log.Debug(log.FacilityAgent, "Added new agent", msg.agent)
-
-				if autorun {
-					meta := msg.agent.Meta()
-					msg.agent.Init()
-
-					c.runAgent(msg.agent)
-
-					waitedAgents[meta.Role]++
-
-					log.Debug(log.FacilityAgent, "New agent started automatically")
-				}
-
-				msg.response.Data(id)
-				msg.response.Ok()
-			} else {
+			if addingLocked {
 				log.Error(log.FacilityAgent, "Tried to add agent after locking with Done()")
 				msg.response.Err(errors.New("Tried to add agent after locking process"))
+				continue
 			}
+
+			// Will need to sort elements again.
+			sorted = false
+
+			id := c.add(msg.agent)
+
+			log.Debug(log.FacilityAgent, "Added new agent", msg.agent)
+
+			if autorun {
+				meta := msg.agent.Meta()
+				msg.agent.Init()
+
+				if err := c.runAgent(msg.agent); err != nil {
+					msg.response.Err(err)
+					continue
+				}
+
+				waitedAgents[meta.Role]++
+
+				log.Debug(log.FacilityAgent, "New agent started automatically")
+			}
+
+			msg.response.Data(id)
+			msg.response.Ok()
 		case agentMessageStatusKill:
 			var realAgent Agent
 
@@ -266,7 +268,9 @@ func (c *Collection) Run(autorun bool) {
 				if meta.Status == AgentStatusNone {
 					meta := a.Meta()
 
-					c.runAgent(a)
+					if err := c.runAgent(a); err != nil {
+						log.Error(log.FacilityAgent, err.Error())
+					}
 
 					waitedAgents[meta.Role]++
 				}
