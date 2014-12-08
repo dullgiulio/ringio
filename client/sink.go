@@ -107,7 +107,7 @@ func addErrorsAgentCmd(client *rpc.Client, filter *msg.Filter, response *server.
 }
 
 func addSinkAgentCmd(client *rpc.Client, filter *msg.Filter, response *server.RpcResp, args []string) {
-	_addSinkAgentCmd(client, filter, response, args, agents.AgentRoleSource)
+	_addSinkAgentCmd(client, filter, response, args, agents.AgentRoleSink)
 }
 
 func _addSinkAgentCmd(client *rpc.Client, filter *msg.Filter, response *server.RpcResp, args []string, role agents.AgentRole) {
