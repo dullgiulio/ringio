@@ -6,6 +6,23 @@ import (
 	"testing"
 )
 
+func _compSlice(s1, s2 []int) bool {
+	l1 := len(s1)
+	l2 := len(s2)
+
+	if l1 != l2 {
+		return false
+	}
+
+	for i := 0; i < l1; i++ {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func TestNewFilter(t *testing.T) {
 	f := NewFilter()
 
@@ -43,6 +60,14 @@ func TestFilter(t *testing.T) {
 	f.Out(1)
 	f.In(2)
 	f.In(1)
+
+	if !_compSlice(f.GetOut(), []int{1, 2}) {
+		t.Error("Unexpected return from GetOut")
+	}
+
+	if !_compSlice(f.GetIn(), []int{1, 2}) {
+		t.Error("Unexpected return from GetIn")
+	}
 
 	if f.String() != "1,2,-1,-2" {
 		t.Error("Unexpected string representation")

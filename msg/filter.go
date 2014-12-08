@@ -23,9 +23,17 @@ func (f *Filter) In(id int) {
 	sort.Ints(f.Included)
 }
 
+func (f *Filter) GetIn() []int {
+	return f.Included
+}
+
 func (f *Filter) Out(id int) {
 	f.Excluded = append(f.Excluded, id)
 	sort.Ints(f.Excluded)
+}
+
+func (f *Filter) GetOut() []int {
+	return f.Excluded
 }
 
 func (f *Filter) String() string {
