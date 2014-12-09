@@ -5,14 +5,14 @@ import (
 	"github.com/dullgiulio/ringio/log"
 )
 
+type ServerAction int
+
 const (
-	ActionNoop = iota
+	ActionNoop ServerAction = iota
 	ActionSetVerbose
 	ActionUnsetVerbose
 	ActionSetLocked
 )
-
-type ServerAction int
 
 func (s *RpcServer) relayErrorsAndOutput() (returnStatus int) {
 	var stdoutCh <-chan interface{}

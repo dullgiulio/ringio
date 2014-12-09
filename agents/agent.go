@@ -13,27 +13,28 @@ import (
 type AgentType int
 
 const (
-	AgentTypeNull = iota
+	AgentTypeNull AgentType = iota
 	AgentTypeCmd
 	AgentTypePipe
 )
 
+type AgentStatus int
+
 const (
-	AgentStatusNone = iota
+	AgentStatusNone AgentStatus = iota
 	AgentStatusRunning
 	AgentStatusKill
 	AgentStatusFinished
 )
 
+type AgentRole int
+
 const (
-	AgentRoleSink = iota
+	AgentRoleSink AgentRole = iota
 	AgentRoleSource
 	AgentRoleErrors
 	AgentRoleLog
 )
-
-type AgentRole int
-type AgentStatus int
 
 func (s AgentStatus) IsFinished() bool {
 	return s == AgentStatusFinished

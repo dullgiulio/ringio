@@ -13,7 +13,7 @@ import (
 type CollectionRingType int
 
 const (
-	CollectionRingTypeErrors = iota
+	CollectionRingTypeErrors CollectionRingType = iota
 	CollectionRingTypeStdout
 	CollectionRingTypeOutput
 )
@@ -21,7 +21,7 @@ const (
 type agentMessageStatus int
 
 const (
-	agentMessageStatusAdd = iota
+	agentMessageStatusAdd agentMessageStatus = iota
 	agentMessageStatusStop
 	agentMessageStatusKill
 	agentMessageStatusFinished

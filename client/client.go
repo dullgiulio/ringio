@@ -14,7 +14,7 @@ import (
 type Command int
 
 const (
-	None = iota
+	None Command = iota
 	Output
 	Input
 	IO

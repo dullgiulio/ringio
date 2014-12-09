@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-type Facility string
-type Level int
 type Logger struct {
 	loggers []io.Writer
 	lock    *sync.Mutex
@@ -18,17 +16,21 @@ type Logger struct {
 
 var _logger Logger
 
-const (
-	FacilityRing    = "ringbuf"
-	FacilityAgent   = "agent"
-	FacilityDefault = "ringio"
-	FacilityStdout  = "stdout"
-	FacilityStderr  = "stderr"
-	FacilityPipe    = "pipe"
-)
+type Facility string
 
 const (
-	LevelDebug = iota
+	FacilityRing    Facility = "ringbuf"
+	FacilityAgent            = "agent"
+	FacilityDefault          = "ringio"
+	FacilityStdout           = "stdout"
+	FacilityStderr           = "stderr"
+	FacilityPipe             = "pipe"
+)
+
+type Level int
+
+const (
+	LevelDebug Level = iota
 	LevelInfo
 	LevelWarn
 	LevelError
