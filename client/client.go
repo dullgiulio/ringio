@@ -25,7 +25,6 @@ const (
 	Close
 	List
 	Stop
-	Set
 )
 
 type Client interface {
@@ -66,7 +65,6 @@ func (cli *Cli) ParseArgs(args []string) error {
 		"list":   List,
 		"ls":     List,
 		"stop":   Stop,
-		"set":    Set,
 	}
 
 	cli.argsLen = len(args) - 3
@@ -164,8 +162,6 @@ func (cli *Cli) getClient() Client {
 		return NewCommandList()
 	case Stop:
 		return NewCommandStop()
-	case Set:
-		return NewCommandSet()
 	}
 
 	return nil

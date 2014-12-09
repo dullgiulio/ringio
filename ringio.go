@@ -36,7 +36,6 @@ func help() int {
        ringio <session-name> input [COMMAND...]
        ringio <session-name> output [COMMAND...]
        ringio <session-name> run
-       ringio <session-name> set [verbose|quiet|locked]
        ringio <session-name> close
 `)
 	return 1

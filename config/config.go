@@ -9,7 +9,6 @@ type _Config struct {
 	RingbufLogSize int64
 	MaxLineSize    int64
 	AutoExit       bool
-	AutoLock       bool
 	AutoRun        bool
 	PrintLog       bool
 	logring        *ringbuf.Ringbuf
@@ -23,7 +22,6 @@ var defaults _Config = _Config{
 	MaxLineSize:    1024,
 	AutoRun:        true,
 	AutoExit:       false,
-	AutoLock:       false,
 	PrintLog:       false,
 }
 

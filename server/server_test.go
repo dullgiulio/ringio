@@ -110,6 +110,5 @@ func TestRpcServer(t *testing.T) {
 		t.Error("Expected error on Close on closed server")
 	}
 
-	log.Cancel()
 	<-proceed
 }

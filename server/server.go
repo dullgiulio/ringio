@@ -16,22 +16,20 @@ import (
 )
 
 type RpcServer struct {
-	ac       *agents.Collection
-	resp     agents.AgentMessageResponseBool
-	actionCh chan ServerAction
-	socket   string
-	over     bool
-	mux      *sync.Mutex
+	ac     *agents.Collection
+	resp   agents.AgentMessageResponseBool
+	socket string
+	over   bool
+	mux    *sync.Mutex
 }
 
 func NewRpcServer(socket string, autorun bool) *RpcServer {
 	ac := agents.NewCollection()
 	s := &RpcServer{
-		socket:   socket,
-		ac:       ac,
-		resp:     agents.NewAgentMessageResponseBool(),
-		actionCh: make(chan ServerAction),
-		mux:      &sync.Mutex{},
+		socket: socket,
+		ac:     ac,
+		resp:   agents.NewAgentMessageResponseBool(),
+		mux:    &sync.Mutex{},
 	}
 
 	go ac.Run(autorun)
@@ -40,8 +38,7 @@ func NewRpcServer(socket string, autorun bool) *RpcServer {
 }
 
 type RpcReq struct {
-	Action ServerAction
-	Agent  *agents.AgentDescr
+	Agent *agents.AgentDescr
 }
 
 type RpcResp bool
@@ -64,13 +61,6 @@ func Run(sessionName string) (returnStatus int) {
 
 	// Serve RPC calls.
 	go s.serve()
-
-	// Relay errors to the main logging.
-	go func() {
-		s.relayErrorsAndOutput()
-
-		log.Cancel()
-	}()
 
 	// Print all logged information.
 	// TODO: minimum level is set via --flag.
@@ -173,22 +163,9 @@ func (s *RpcServer) Close(req *RpcReq, result *RpcResp) error {
 	s.ac.Cancel(&s.resp)
 	s.resp.Get()
 
+	log.Cancel()
+
 	onexit.PendingExit(0)
-
-	return nil
-}
-
-func (s *RpcServer) Set(req *RpcReq, result *RpcResp) error {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	if s.over {
-		return sessionOver
-	}
-
-	*result = true
-
-	s.actionCh <- req.Action
 
 	return nil
 }

@@ -25,10 +25,6 @@ func TestDefaults(t *testing.T) {
 		t.Error("Invalid default")
 	}
 
-	if C.AutoLock != defaults.AutoLock {
-		t.Error("Invalid default")
-	}
-
 	if C.PrintLog != defaults.PrintLog {
 		t.Error("Invalid default")
 	}

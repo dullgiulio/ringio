@@ -138,10 +138,4 @@ func TestCorrectClient(t *testing.T) {
 	if _, ok := c.(*CommandStop); !ok {
 		t.Error("Invalid client instance")
 	}
-
-	cli.Command = Set
-	c = cli.getClient()
-	if _, ok := c.(*CommandSet); !ok {
-		t.Error("Invalid client instance")
-	}
 }

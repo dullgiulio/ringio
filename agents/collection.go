@@ -27,7 +27,6 @@ const (
 	agentMessageStatusFinished
 	agentMessageStatusRunning
 	agentMessageStatusList
-	agentMessageStatusDone
 	agentMessageStatusAutorun
 	agentMessageStatusCancel
 )
@@ -65,10 +64,6 @@ func NewCollection() *Collection {
 
 func (c *Collection) Cancel(response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageStatusCancel, response, nil)
-}
-
-func (c *Collection) Done() {
-	c.requestCh <- newAgentMessage(agentMessageStatusDone, nil, nil)
 }
 
 func (c *Collection) Add(a Agent, response AgentMessageResponse) {
@@ -172,7 +167,7 @@ func (c *Collection) stopAgent(a Agent) {
 }
 
 func (c *Collection) Run(autorun bool) {
-	var addingLocked, sorted bool
+	var sorted bool
 
 	go c.errors.Run()
 	go c.output.Run()
@@ -183,12 +178,6 @@ func (c *Collection) Run(autorun bool) {
 	for msg := range c.requestCh {
 		switch msg.status {
 		case agentMessageStatusAdd:
-			if addingLocked {
-				log.Error(log.FacilityAgent, "Tried to add agent after locking with Done()")
-				msg.response.Err(errors.New("Tried to add agent after locking process"))
-				continue
-			}
-
 			// Will need to sort elements again.
 			sorted = false
 
@@ -246,17 +235,10 @@ func (c *Collection) Run(autorun bool) {
 			c.Close()
 			msg.response.Ok()
 			return
-		case agentMessageStatusDone:
-			log.Debug(log.FacilityAgent, "Adding agents has been disabled")
-			addingLocked = true
 		case agentMessageStatusAutorun:
 			if autorun {
 				msg.response.Ok()
 				continue
-			}
-
-			if config.C.AutoLock {
-				addingLocked = true
 			}
 
 			autorun = true
@@ -305,14 +287,6 @@ func (c *Collection) Run(autorun bool) {
 
 			msg.response.Data(&agents)
 			msg.response.Ok()
-		}
-
-		if addingLocked && autorun &&
-			waitedAgents[AgentRoleSource] == 0 {
-			c.output.Eof()
-
-			// Must not send EOF to the ringbuf twice.
-			waitedAgents[AgentRoleSource] = -1
 		}
 
 		if config.C.AutoExit &&

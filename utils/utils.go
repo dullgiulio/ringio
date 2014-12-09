@@ -60,5 +60,5 @@ func Fatal(err error) {
 }
 
 func Error(err error) {
-    fmt.Fprintf(os.Stderr, "ringio: %s\n", err)
+	fmt.Fprintf(os.Stderr, "ringio: %s\n", err)
 }

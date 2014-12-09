@@ -156,34 +156,6 @@ func TestInvalidActions(t *testing.T) {
 
 	resp := NewAgentMessageResponseBool()
 
-	agent := NewAgentNull(0, AgentRoleSink, nil)
-
-	ac.Done()
-	ac.Add(agent, &resp)
-
-	_, err := resp.Get()
-	if err == nil {
-		t.Error("Expected an error after adding to a locked collection")
-	}
-
-	meta := agent.Meta()
-
-	if meta.Id != 0 {
-		t.Error("Did not expect agent to have an assigned ID")
-	}
-
-	if meta.Role != AgentRoleSink {
-		t.Error("Adding an agent changed its role")
-	}
-
-	if !meta.Started.IsZero() {
-		t.Error("Expected starting time to be still undefined")
-	}
-
-	if !meta.Finished.IsZero() {
-		t.Error("Expected finish time to be still undefined")
-	}
-
 	// Test that cancel exits correctly.
 	ac.Cancel(&resp)
 	resp.Get()
