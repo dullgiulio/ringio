@@ -141,7 +141,6 @@ func (ac *Collection) isFilteringSinkAgents(filter *msg.Filter) bool {
 		return false
 	}
 
-	// XXX: Unsafe access of ac.agents. Unlikely but possible race condition.
 	for _, a := range ac.agents {
 		meta := a.Meta()
 
@@ -203,8 +202,8 @@ func (ac *Collection) validateFilter(self int, filter *msg.Filter) error {
 	return nil
 }
 
-func (ac *Collection) outputFromRingbuf(a Agent, filter *msg.Filter) {
-	if ac.isFilteringSinkAgents(filter) {
+func (ac *Collection) outputFromRingbuf(a Agent, filter *msg.Filter, filtersSinks bool) {
+	if filtersSinks {
 		a.OutputFromRingbuf(ac.stdout, ac.errors, ac.stdout, filter)
 	} else {
 		a.OutputFromRingbuf(ac.stdout, ac.errors, ac.output, filter)
@@ -235,6 +234,8 @@ func (ac *Collection) runAgent(a Agent) error {
 		return err
 	}
 
+	filtersSinks := ac.isFilteringSinkAgents(meta.Filter)
+
 	meta.Started = time.Now()
 	meta.Status = AgentStatusRunning
 
@@ -245,7 +246,7 @@ func (ac *Collection) runAgent(a Agent) error {
 		case AgentRoleErrors:
 			ac.errorsFromRingbuf(a, meta.Filter)
 		case AgentRoleSink:
-			ac.outputFromRingbuf(a, meta.Filter)
+			ac.outputFromRingbuf(a, meta.Filter, filtersSinks)
 		case AgentRoleLog:
 			ac.logFromRingbuf(a)
 		}
