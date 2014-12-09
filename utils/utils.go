@@ -58,3 +58,7 @@ func Fatal(err error) {
 	fmt.Fprintf(os.Stderr, "ringio: %s\n", err)
 	os.Exit(1)
 }
+
+func Error(err error) {
+    fmt.Fprintf(os.Stderr, "ringio: %s\n", err)
+}
