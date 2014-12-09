@@ -14,33 +14,6 @@ import (
 	"github.com/dullgiulio/ringio/utils"
 )
 
-func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName string) {
-	var id int
-
-	p := pipe.New(pipeName)
-
-	if err := p.OpenWriteErr(); err != nil {
-		utils.Fatal(fmt.Errorf("Couldn't open pipe for writing: %s", err))
-	}
-
-	if err := client.Call("RpcServer.Add", &server.RpcReq{
-		Agent: &agents.AgentDescr{
-			Args: []string{pipeName},
-			Meta: agents.AgentMetadata{Role: agents.AgentRoleSource},
-			Type: agents.AgentTypePipe,
-		},
-	}, &id); err != nil {
-		utils.Fatal(err)
-	}
-
-	// Write to pipe from stdin.
-	r := bufio.NewReader(os.Stdin)
-
-	if _, err := r.WriteTo(p); err != nil {
-		utils.Fatal(err)
-	}
-}
-
 func addErrorsAgentPipe(client *rpc.Client, filter *msg.Filter, response *server.RpcResp, pipeName string) {
 	_addSinkAgentPipe(client, filter, response, pipeName, agents.AgentRoleErrors)
 }
@@ -84,20 +57,6 @@ func _addSinkAgentPipe(client *rpc.Client, filter *msg.Filter,
 	r := bufio.NewReader(p)
 
 	if _, err := r.WriteTo(os.Stdout); err != nil {
-		utils.Fatal(err)
-	}
-}
-
-func addSourceAgentCmd(client *rpc.Client, response *server.RpcResp, args []string) {
-	var id int
-
-	if err := client.Call("RpcServer.Add", &server.RpcReq{
-		Agent: &agents.AgentDescr{
-			Args: args,
-			Meta: agents.AgentMetadata{Role: agents.AgentRoleSource},
-			Type: agents.AgentTypeCmd,
-		},
-	}, &id); err != nil {
 		utils.Fatal(err)
 	}
 }
