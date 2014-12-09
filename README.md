@@ -1,6 +1,6 @@
 # RINGIO
 
-Ringio (pronounced *ring-yo*) is a tool for creating dynamic data pipes. It is what you get when you mix "screen"/"tmux" with "tee".
+Ringio (pronounced *ring-yo*) is a tool for creating interactive data pipes. It is what you get when you mix "screen"/"tmux" with "tee".
 
 ### Usage
 
