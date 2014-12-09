@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"net/rpc"
-	"strconv"
 
 	"github.com/dullgiulio/ringio/server"
 	"github.com/dullgiulio/ringio/utils"
@@ -33,15 +32,22 @@ func (c *CommandStop) Init(fs *flag.FlagSet) error {
 func (c *CommandStop) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	if len(cli.Args) < 1 {
-		utils.Fatal(errors.New("Stop must be followed by an argument."))
+	argsErr := errors.New("Stop must be followed by an argument.")
+
+	if cli.Filter == nil {
+		utils.Fatal(argsErr)
 	}
 
-	// Stop program by id
-	if id, err := strconv.Atoi(cli.Args[0]); err != nil {
-		utils.Fatal(err)
-	} else if err = c.client.Call("RpcServer.Stop", id, &c.response); err != nil {
-		utils.Fatal(err)
+	in := cli.Filter.GetIn()
+
+	if len(in) == 0 {
+		utils.Fatal(argsErr)
+	}
+
+	for _, id := range in {
+		if err := c.client.Call("RpcServer.Stop", id, &c.response); err != nil {
+			utils.Error(err)
+		}
 	}
 
 	return nil
