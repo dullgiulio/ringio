@@ -288,15 +288,6 @@ func (c *Collection) Run(autorun bool) {
 			msg.response.Data(&agents)
 			msg.response.Ok()
 		}
-
-		if config.C.AutoExit &&
-			waitedAgents[AgentRoleSource] <= 0 &&
-			waitedAgents[AgentRoleSink] <= 0 &&
-			waitedAgents[AgentRoleLog] <= 0 {
-			log.Debug(log.FacilityAgent, "No more agents to wait for, exiting main loop")
-			c.Close()
-			return
-		}
 	}
 }
 

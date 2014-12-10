@@ -21,10 +21,6 @@ func TestDefaults(t *testing.T) {
 		t.Error("Invalid default")
 	}
 
-	if C.AutoExit != defaults.AutoExit {
-		t.Error("Invalid default")
-	}
-
 	if C.PrintLog != defaults.PrintLog {
 		t.Error("Invalid default")
 	}

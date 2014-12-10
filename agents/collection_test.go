@@ -3,7 +3,6 @@ package agents
 import (
 	"testing"
 
-	"github.com/dullgiulio/ringio/config"
 	"github.com/dullgiulio/ringio/log"
 )
 
@@ -18,8 +17,6 @@ func readLogs(t *testing.T) {
 }
 
 func TestAgentAdding(t *testing.T) {
-	config.C.AutoExit = false
-
 	go readLogs(t)
 
 	proceed := make(chan struct{})
@@ -143,8 +140,6 @@ func TestAgentAdding(t *testing.T) {
 }
 
 func TestInvalidActions(t *testing.T) {
-	config.C.AutoExit = false
-
 	go readLogs(t)
 
 	proceed := make(chan struct{})
