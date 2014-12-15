@@ -31,11 +31,16 @@ func main() {
 }
 
 func help() int {
-	fmt.Printf(
+	fmt.Print(
 		`Usage: ringio <session-name> open &
-       ringio <session-name> input [COMMAND...]
-       ringio <session-name> output [COMMAND...]
+       ringio <session-name> in|input [%job...] [-%job...] [COMMAND...]
+       ringio <session-name> out|output [%job...] [-%job...] [COMMAND...]
+       ringio <session-name> io [%job...] [-%job...] [COMMAND...]
        ringio <session-name> run
+       ringio <session-name> list
+       ringio <session-name> stop %job
+       ringio <session-name> kill %job
+       ringio <session-name> log
        ringio <session-name> close
 `)
 	return 1
