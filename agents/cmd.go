@@ -1,6 +1,7 @@
 package agents
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 	"sync"
@@ -11,16 +12,16 @@ import (
 )
 
 type AgentCmd struct {
-	cmd    *exec.Cmd
-	meta   *AgentMetadata
-	cancel chan bool
+	cmd      *exec.Cmd
+	meta     *AgentMetadata
+	cancelCh chan bool
 }
 
 func NewAgentCmd(cmd []string, role AgentRole, filter *msg.Filter) *AgentCmd {
 	return &AgentCmd{
-		cmd:    exec.Command(cmd[0], cmd[1:]...),
-		meta:   &AgentMetadata{Role: role, Filter: filter},
-		cancel: make(chan bool),
+		cmd:      exec.Command(cmd[0], cmd[1:]...),
+		meta:     &AgentMetadata{Role: role, Filter: filter},
+		cancelCh: make(chan bool),
 	}
 }
 
@@ -43,15 +44,49 @@ func (a *AgentCmd) String() string {
 	return strings.Join(a.cmd.Args, " ")
 }
 
-func (a *AgentCmd) Cancel() error {
-	a.cancel <- true
-	a.cancel <- true
+func (a *AgentCmd) cancel() {
+	a.cancelCh <- true
+	a.cancelCh <- true
 
 	if a.meta.Role != AgentRoleSource {
-		a.cancel <- true
+		a.cancelCh <- true
+	}
+}
+
+func (a *AgentCmd) Stop() error {
+	// Stop data pipes to this process.
+	if a.meta.Status.IsRunning() {
+		a.cancel()
 	}
 
-	return a.cmd.Process.Kill()
+	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been stopped", a.meta.Id))
+
+	// Subprocess should exit normally now, a successive Wait() will finish it.
+
+	return nil
+}
+
+func (a *AgentCmd) Kill() error {
+	// Stop data pipes to this process.
+	if a.meta.Status.IsRunning() {
+		a.cancel()
+	}
+
+	if err := a.cmd.Process.Kill(); err != nil {
+		return err
+	}
+
+	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been killed", a.meta.Id))
+
+	return nil
+}
+
+func (a *AgentCmd) WaitFinish() error {
+	if err := a.cmd.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
@@ -79,8 +114,8 @@ func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
 
-	go writeToRingbuf(id, stderr, errors, a.cancel, wg)
-	go writeToRingbuf(id, stdout, output, a.cancel, wg)
+	go writeToRingbuf(id, stderr, errors, a.cancelCh, wg)
+	go writeToRingbuf(id, stdout, output, a.cancelCh, wg)
 
 	wg.Wait()
 
@@ -88,13 +123,7 @@ func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	stderr.Close()
 	stdout.Close()
 
-	close(a.cancel)
-}
-
-func (a *AgentCmd) Stop() {
-	if err := a.cmd.Wait(); err != nil {
-		log.Error(log.FacilityAgent, err)
-	}
+	close(a.cancelCh)
 }
 
 func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
@@ -129,11 +158,11 @@ func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf,
 	wg := new(sync.WaitGroup)
 	wg.Add(3)
 
-	go writeToRingbuf(id, stdout, rStdout, a.cancel, wg)
-	go writeToRingbuf(id, stderr, rErrors, a.cancel, wg)
-	go readFromRingbuf(stdin, filter, rOutput, a.cancel, wg)
+	go writeToRingbuf(id, stdout, rStdout, a.cancelCh, wg)
+	go writeToRingbuf(id, stderr, rErrors, a.cancelCh, wg)
+	go readFromRingbuf(stdin, filter, rOutput, a.cancelCh, wg)
 
 	wg.Wait()
 
-	close(a.cancel)
+	close(a.cancelCh)
 }

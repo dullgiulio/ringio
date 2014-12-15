@@ -23,7 +23,8 @@ type AgentStatus int
 const (
 	AgentStatusNone AgentStatus = iota
 	AgentStatusRunning
-	AgentStatusKill
+	AgentStatusKilled
+	AgentStatusStopped
 	AgentStatusFinished
 )
 
@@ -36,16 +37,18 @@ const (
 	AgentRoleLog
 )
 
-func (s AgentStatus) IsFinished() bool {
-	return s == AgentStatusFinished
+func (s AgentStatus) IsRunning() bool {
+	return s == AgentStatusRunning
 }
 
 func (s AgentStatus) String() string {
 	switch s {
 	case AgentStatusRunning:
 		return "R"
-	case AgentStatusKill:
-		return "F"
+	case AgentStatusStopped:
+		return "S"
+	case AgentStatusKilled:
+		return "K"
 	case AgentStatusFinished:
 		return "F"
 	}
@@ -110,8 +113,12 @@ func (a *AgentDescr) Text() string {
 
 type Agent interface {
 	Init()
-	Stop()
-	Cancel() error
+	// Gracefully stop an Agent.
+	Stop() error
+	// Forced stop of an Agent. Can be force onto stopped agents.
+	Kill() error
+	// Returns when the Agent is definitely finished and can be marked as such.
+	WaitFinish() error
 	String() string
 	Meta() *AgentMetadata
 	Descr() AgentDescr
@@ -119,15 +126,9 @@ type Agent interface {
 	OutputFromRingbuf(stdout, errors, output *ringbuf.Ringbuf, filter *msg.Filter)
 }
 
-func (ac *Collection) _responseOk(a Agent) {
-	resp := NewAgentMessageResponseBool()
-	ac.SetAgentStatusFinished(a, &resp)
-	resp.Get()
-}
-
 func (ac *Collection) inputToRingbuf(a Agent) {
 	a.InputToRingbuf(ac.errors, ac.output)
-	ac._responseOk(a)
+	ac.waitFinish(a)
 }
 
 func (ac *Collection) isFilteringSinkAgents(filter *msg.Filter) bool {
@@ -210,20 +211,28 @@ func (ac *Collection) outputFromRingbuf(a Agent, filter *msg.Filter, filtersSink
 		a.OutputFromRingbuf(ac.stdout, ac.errors, ac.output, filter)
 	}
 
-	ac._responseOk(a)
+	// XXX: This may cause Wait() to be called twice. We get an error, but
+	//      does no harm.
+	ac.waitFinish(a)
 }
 
 func (ac *Collection) errorsFromRingbuf(a Agent, filter *msg.Filter) {
 	// We both read and write on errors.
 	a.OutputFromRingbuf(ac.errors, ac.errors, ac.errors, filter)
-	ac._responseOk(a)
+
+	// XXX: This may cause Wait() to be called twice. We get an error, but
+	//      does no harm.
+	ac.waitFinish(a)
 }
 
 func (ac *Collection) logFromRingbuf(a Agent) {
 	logring := config.GetLogRingbuf()
 
 	a.OutputFromRingbuf(logring, logring, logring, nil)
-	ac._responseOk(a)
+
+	// XXX: This may cause Wait() to be called twice. We get an error, but
+	//      does no harm.
+	ac.waitFinish(a)
 }
 
 func (ac *Collection) runAgent(a Agent) error {

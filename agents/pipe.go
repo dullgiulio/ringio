@@ -1,22 +1,25 @@
 package agents
 
 import (
+	"fmt"
+
 	"github.com/dullgiulio/ringbuf"
+	"github.com/dullgiulio/ringio/log"
 	"github.com/dullgiulio/ringio/msg"
 	"github.com/dullgiulio/ringio/pipe"
 )
 
 type AgentPipe struct {
-	pipe   *pipe.Pipe
-	meta   *AgentMetadata
-	cancel chan bool
+	pipe     *pipe.Pipe
+	meta     *AgentMetadata
+	cancelCh chan bool
 }
 
 func NewAgentPipe(pipeName string, role AgentRole, filter *msg.Filter) *AgentPipe {
 	return &AgentPipe{
-		pipe:   pipe.New(pipeName),
-		meta:   &AgentMetadata{Role: role, Filter: filter},
-		cancel: make(chan bool),
+		pipe:     pipe.New(pipeName),
+		meta:     &AgentMetadata{Role: role, Filter: filter},
+		cancelCh: make(chan bool),
 	}
 }
 
@@ -25,6 +28,7 @@ func (a *AgentPipe) Init() {
 		a.meta.Role == AgentRoleErrors ||
 		a.meta.Role == AgentRoleLog {
 		if ok := a.pipe.OpenWrite(); !ok {
+			// TODO:XXX: Must return the error to the user.
 			return
 		}
 	}
@@ -46,8 +50,34 @@ func (a *AgentPipe) String() string {
 	return "|" + a.pipe.String()
 }
 
-func (a *AgentPipe) Cancel() error {
-	a.cancel <- true
+func (a *AgentPipe) cancel() error {
+	if a.meta.Status.IsRunning() {
+		a.cancelCh <- true
+	}
+
+	a.pipe.Close()
+	return nil
+}
+
+func (a *AgentPipe) Stop() error {
+	if err := a.cancel(); err != nil {
+		return err
+	}
+
+	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been stopped", a.meta.Id))
+	return nil
+}
+
+func (a *AgentPipe) Kill() error {
+	if err := a.Stop(); err != nil {
+		return err
+	}
+
+	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been stopped", a.meta.Id))
+	return nil
+}
+
+func (a *AgentPipe) WaitFinish() error {
 	return nil
 }
 
@@ -60,25 +90,21 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 
 	id := a.meta.Id
 
-	cancelled := writeToRingbuf(id, a.pipe, rOutput, a.cancel, nil)
+	cancelled := writeToRingbuf(id, a.pipe, rOutput, a.cancelCh, nil)
 
 	if !cancelled {
-		<-a.cancel
+		<-a.cancelCh
 	}
 
-	close(a.cancel)
-}
-
-func (a *AgentPipe) Stop() {
-	a.pipe.Close()
+	close(a.cancelCh)
 }
 
 func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
-	cancelled := readFromRingbuf(a.pipe, filter, rOutput, a.cancel, nil)
+	cancelled := readFromRingbuf(a.pipe, filter, rOutput, a.cancelCh, nil)
 
 	if !cancelled {
-		<-a.cancel
+		<-a.cancelCh
 	}
 
-	close(a.cancel)
+	close(a.cancelCh)
 }

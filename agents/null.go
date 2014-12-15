@@ -6,14 +6,14 @@ import (
 )
 
 type AgentNull struct {
-	meta *AgentMetadata
-	Kill chan bool
+	meta   *AgentMetadata
+	cancel chan bool
 }
 
 func NewAgentNull(id int, role AgentRole, filter *msg.Filter) *AgentNull {
 	return &AgentNull{
-		meta: &AgentMetadata{Id: id, Role: role, Filter: filter},
-		Kill: make(chan bool),
+		meta:   &AgentMetadata{Id: id, Role: role, Filter: filter},
+		cancel: make(chan bool),
 	}
 }
 
@@ -36,18 +36,23 @@ func (a *AgentNull) String() string {
 	return "AgentNull"
 }
 
-func (a *AgentNull) Cancel() error {
-	a.Kill <- true
+func (a *AgentNull) Stop() error {
 	return nil
 }
 
-func (a *AgentNull) Stop() {
+func (a *AgentNull) Kill() error {
+	return nil
+}
+
+func (a *AgentNull) WaitFinish() error {
+	a.cancel <- true
+	return nil
 }
 
 func (a *AgentNull) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
-	<-a.Kill
+	<-a.cancel
 }
 
 func (a *AgentNull) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
-	<-a.Kill
+	<-a.cancel
 }
