@@ -242,7 +242,7 @@ func (c *Collection) Run(autorun bool) {
 		case agentMessageAdd:
 			id := c.add(msg.agent)
 
-			log.Debug(log.FacilityAgent, "Added new agent", msg.agent)
+			log.Info(log.FacilityAgent, "Added new agent", msg.agent)
 
 			if autorun {
 				msg.agent.Init()
@@ -306,7 +306,7 @@ func (c *Collection) Run(autorun bool) {
 				}
 			}
 
-			log.Debug(log.FacilityAgent, "Starting all agents")
+			log.Info(log.FacilityAgent, "Starting all agents")
 
 			msg.response.Ok()
 		case agentMessageFinished:
@@ -314,7 +314,7 @@ func (c *Collection) Run(autorun bool) {
 			meta.Finished = time.Now()
 			meta.Status = AgentStatusFinished
 
-			log.Debug(log.FacilityAgent, "Agent", msg.agent, "finished")
+			log.Info(log.FacilityAgent, "Agent", msg.agent, "finished")
 
 			msg.response.Ok()
 		case agentMessageList:
