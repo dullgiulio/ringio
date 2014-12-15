@@ -18,26 +18,26 @@ const (
 	CollectionRingTypeOutput
 )
 
-type agentMessageStatus int
+type agentMessage int
 
 const (
-	agentMessageStatusAdd agentMessageStatus = iota
-	agentMessageStatusStop
-	agentMessageStatusKill
-	agentMessageStatusFinished
-	agentMessageStatusRunning
-	agentMessageStatusList
-	agentMessageStatusAutorun
-	agentMessageStatusCancel
+	agentMessageAdd agentMessage = iota
+	agentMessageStop
+	agentMessageKill
+	agentMessageFinished
+	agentMessageRunning
+	agentMessageList
+	agentMessageAutorun
+	agentMessageCancel
 )
 
 type agentMessage struct {
-	status   agentMessageStatus
+	status   agentMessage
 	response AgentMessageResponse
 	agent    Agent
 }
 
-func newAgentMessage(status agentMessageStatus, response AgentMessageResponse, agent Agent) agentMessage {
+func newAgentMessage(status agentMessage, response AgentMessageResponse, agent Agent) agentMessage {
 	return agentMessage{status: status, response: response, agent: agent}
 }
 
@@ -63,31 +63,31 @@ func NewCollection() *Collection {
 }
 
 func (c *Collection) Cancel(response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusCancel, response, nil)
+	c.requestCh <- newAgentMessage(agentMessageCancel, response, nil)
 }
 
 func (c *Collection) Add(a Agent, response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusAdd, response, a)
+	c.requestCh <- newAgentMessage(agentMessageAdd, response, a)
 }
 
 func (c *Collection) StartAll(response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusAutorun, response, nil)
+	c.requestCh <- newAgentMessage(agentMessageAutorun, response, nil)
 }
 
 func (c *Collection) SetAgentStatusFinished(a Agent, response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusFinished, response, a)
+	c.requestCh <- newAgentMessage(agentMessageFinished, response, a)
 }
 
 func (c *Collection) SetAgentStatusKill(a Agent, response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusKill, response, a)
+	c.requestCh <- newAgentMessage(agentMessageKill, response, a)
 }
 
 func (c *Collection) SetAgentStatusRunning(a Agent, response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusRunning, response, a)
+	c.requestCh <- newAgentMessage(agentMessageRunning, response, a)
 }
 
 func (c *Collection) List(response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageStatusList, response, nil)
+	c.requestCh <- newAgentMessage(agentMessageList, response, nil)
 }
 
 func (c *Collection) Reader(which CollectionRingType) <-chan interface{} {
@@ -177,7 +177,7 @@ func (c *Collection) Run(autorun bool) {
 
 	for msg := range c.requestCh {
 		switch msg.status {
-		case agentMessageStatusAdd:
+		case agentMessageAdd:
 			// Will need to sort elements again.
 			sorted = false
 
@@ -201,7 +201,7 @@ func (c *Collection) Run(autorun bool) {
 
 			msg.response.Data(id)
 			msg.response.Ok()
-		case agentMessageStatusKill:
+		case agentMessageKill:
 			var realAgent Agent
 
 			meta := msg.agent.Meta()
@@ -224,7 +224,7 @@ func (c *Collection) Run(autorun bool) {
 
 				msg.response.Ok()
 			}
-		case agentMessageStatusCancel:
+		case agentMessageCancel:
 			// Kill all outstanding processes.
 			for _, a := range c.agents {
 				if a.Meta().Status == AgentStatusRunning {
@@ -235,7 +235,7 @@ func (c *Collection) Run(autorun bool) {
 			c.Close()
 			msg.response.Ok()
 			return
-		case agentMessageStatusAutorun:
+		case agentMessageAutorun:
 			if autorun {
 				msg.response.Ok()
 				continue
@@ -261,7 +261,7 @@ func (c *Collection) Run(autorun bool) {
 			log.Debug(log.FacilityAgent, "Starting all agents")
 
 			msg.response.Ok()
-		case agentMessageStatusFinished:
+		case agentMessageFinished:
 			sorted = false
 
 			meta := msg.agent.Meta()
@@ -273,7 +273,7 @@ func (c *Collection) Run(autorun bool) {
 			log.Debug(log.FacilityAgent, "Agent", msg.agent, "finished")
 
 			msg.response.Ok()
-		case agentMessageStatusList:
+		case agentMessageList:
 			var agents []AgentDescr
 
 			if !sorted {
