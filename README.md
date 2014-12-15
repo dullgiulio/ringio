@@ -1,5 +1,7 @@
 # RINGIO
 
+[![Build Status](https://drone.io/github.com/dullgiulio/ringio/status.png)](https://drone.io/github.com/dullgiulio/ringio/latest)
+
 Ringio (pronounced *ring-yo*) is a tool for creating interactive data pipes. It is what you get when you mix "screen"/"tmux" with "tee".
 
 ### Usage
@@ -21,6 +23,10 @@ $ ringio web-logs output # Will print to the console.
   - List agents for a session:
 ```bash
 $ ringio web-logs list
+```
+  - See the internal log for the session:
+```bash
+$ ringio web-logs log
 ```
   - Close the session.
 ```bash

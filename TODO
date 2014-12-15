@@ -1,3 +1,5 @@
+* Stopping "wc -l" should still catch the output
+
 * ringio -ls -> dislays all sessions
 * ringio -k <session-name> -> forbicly remove a session socket
 
