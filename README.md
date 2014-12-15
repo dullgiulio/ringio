@@ -32,7 +32,7 @@ $ ringio web-logs close
 You need the Go lang development environment installed and set up:
 
 ```bash
-$ go build bitbucket.org/dullgiulio/ringio
+$ go build github.org/dullgiulio/ringio
 ```
 
 Downloads will be available soon.
