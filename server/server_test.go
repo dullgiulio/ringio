@@ -39,12 +39,12 @@ func TestRpcServer(t *testing.T) {
 
 	var done RpcResp
 
-	if err := s.Stop(resp, &done); err != nil {
+	if err := s.Kill(resp, &done); err != nil {
 		t.Error(err)
 	}
 
 	if !done {
-		t.Error("Expected Stop to return success")
+		t.Error("Expected Kill to return success")
 	}
 
 	done = false
