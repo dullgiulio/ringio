@@ -81,4 +81,6 @@ func _addSinkAgentCmd(client *rpc.Client, filter *msg.Filter, response *server.R
 	}, &id); err != nil {
 		utils.Fatal(err)
 	}
+
+    fmt.Printf("Added agent %%%d\n", id)
 }
