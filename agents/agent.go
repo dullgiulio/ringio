@@ -2,8 +2,9 @@ package agents
 
 import (
 	"fmt"
-	"strings"
-	"time"
+    "time"
+	"bytes"
+    "strings"
 
 	"github.com/dullgiulio/ringbuf"
 	"github.com/dullgiulio/ringio/config"
@@ -17,6 +18,17 @@ const (
 	AgentTypeCmd
 	AgentTypePipe
 )
+
+func (t AgentType) String() string {
+    switch t {
+    case AgentTypeCmd:
+        return "$"
+    case AgentTypePipe:
+        return "|"
+    }
+
+    return "?"
+}
 
 type AgentStatus int
 
@@ -37,6 +49,36 @@ const (
 	AgentRoleLog
 )
 
+func (r AgentRole) String() string {
+    switch r {
+    case AgentRoleSink:
+        return "->"
+    case AgentRoleSource:
+        return "<-"
+    case AgentRoleErrors:
+        return "&&"
+    case AgentRoleLog:
+        return "||"
+    }
+
+    return ""
+}
+
+func (r AgentRole) Text() string {
+    switch r {
+    case AgentRoleSink:
+        return "output"
+    case AgentRoleSource:
+        return "input"
+    case AgentRoleErrors:
+        return "errors"
+    case AgentRoleLog:
+        return "logs"
+    }
+
+    return ""
+}
+
 func (s AgentStatus) IsRunning() bool {
 	return s == AgentStatusRunning
 }
@@ -54,6 +96,21 @@ func (s AgentStatus) String() string {
 	}
 
 	return "?"
+}
+
+func (s AgentStatus) Text() string {
+    switch s {
+    case AgentStatusRunning:
+		return "running"
+	case AgentStatusStopped:
+		return "stopped"
+	case AgentStatusKilled:
+		return "killed"
+	case AgentStatusFinished:
+		return "finished"
+    }
+
+    return "none"
 }
 
 type AgentMetadata struct {
@@ -74,41 +131,50 @@ type AgentDescr struct {
 func (a *AgentDescr) String() string {
 	var args string
 
-	flow := "->"
-
 	if a.Type == AgentTypeCmd {
 		args = strings.Join(a.Args, " ")
 	} else if a.Type == AgentTypePipe {
 		args = "[pipe]"
 	}
 
-	if a.Meta.Role == AgentRoleSource {
-		flow = "<-"
-	}
+    filter := ""
 
 	if a.Meta.Role == AgentRoleSink &&
 		a.Meta.Filter != nil {
-		flow = fmt.Sprintf("-> [%s]", a.Meta.Filter.String())
+		filter = fmt.Sprintf(" [%s]", a.Meta.Filter.String())
 	}
 
-	return fmt.Sprintf("%d %s %s %s",
-		a.Meta.Id, a.Meta.Status.String(), flow, args)
+	return fmt.Sprintf("%d %s %s%s %s",
+		a.Meta.Id, a.Meta.Status.String(), a.Meta.Role.String(), filter, args)
 }
 
 func (a *AgentDescr) Text() string {
-	var started, finished string
+	var b bytes.Buffer
+    
+    dateFormat := "2006-01-02 15:04:05 -0700 MST"
+    descr := "[pipe]"
 
-	str := a.String()
+    if a.Type == AgentTypeCmd {
+        descr = strings.Join(a.Args, " ")
+    }
+
+    fmt.Fprintf(&b, "%%%d %s agent\n", a.Meta.Id, a.Meta.Role.Text())
+    fmt.Fprintf(&b, "status: %s\n", a.Meta.Status.Text())
+    fmt.Fprintf(&b, "descr: %s\n", descr)
 
 	if a.Meta.Status != AgentStatusNone {
-		started = fmt.Sprintf("  Started: %s\n", a.Meta.Started.Format("2006-01-02 15:04:05 -0700 MST"))
-	}
+		fmt.Fprintf(&b, "started: %s\n", a.Meta.Started.Format(dateFormat))
+	} else {
+        fmt.Fprintf(&b, "started: not started\n")
+    }
 
 	if a.Meta.Status == AgentStatusFinished {
-		finished = fmt.Sprintf("  Finished: %s\n", a.Meta.Finished.Format("2006-01-02 15:04:05 -0700 MST"))
-	}
+		fmt.Fprintf(&b, "finished: %s\n", a.Meta.Finished.Format(dateFormat))
+	} else {
+        fmt.Fprintf(&b, "finished: not finished\n")
+    }
 
-	return fmt.Sprintf("%s\n%s%s", str, started, finished)
+    return b.String()
 }
 
 type Agent interface {
