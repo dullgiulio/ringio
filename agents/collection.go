@@ -336,6 +336,4 @@ func (c *Collection) Close() {
 	c.output.Cancel()
 	c.errors.Cancel()
 	c.stdout.Cancel()
-
-	close(c.requestCh)
 }
