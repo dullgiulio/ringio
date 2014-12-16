@@ -73,7 +73,7 @@ func (a *AgentPipe) Kill() error {
 		return err
 	}
 
-	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been stopped", a.meta.Id))
+	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been killed", a.meta.Id))
 	return nil
 }
 
