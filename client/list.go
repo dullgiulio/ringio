@@ -12,8 +12,8 @@ import (
 )
 
 type CommandList struct {
-	client *rpc.Client
-    verbose bool
+	client  *rpc.Client
+	verbose bool
 }
 
 func NewCommandList() *CommandList {
@@ -26,7 +26,7 @@ func (c *CommandList) Help() string {
 
 func (c *CommandList) Init(fs *flag.FlagSet) error {
 	fs.BoolVar(&c.verbose, "verbose", false, "Long version of the list")
-    return nil
+	return nil
 }
 
 func (c *CommandList) Run(cli *Cli) error {
@@ -39,10 +39,10 @@ func (c *CommandList) Run(cli *Cli) error {
 		if responseList.Agents != nil {
 			for _, a := range *responseList.Agents {
 				if c.verbose {
-                    fmt.Printf("%s\n", a.Text())
-                } else {
-                    fmt.Printf("%s\n", &a)
-                }
+					fmt.Printf("%s\n", a.Text())
+				} else {
+					fmt.Printf("%s\n", &a)
+				}
 			}
 		} else {
 			utils.Fatal(errors.New("This session is currently empty."))

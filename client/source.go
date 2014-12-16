@@ -52,5 +52,5 @@ func addSourceAgentCmd(client *rpc.Client, response *server.RpcResp, args []stri
 		utils.Fatal(err)
 	}
 
-    fmt.Printf("Added agent %%%d\n", id)
+	fmt.Printf("Added agent %%%d\n", id)
 }
