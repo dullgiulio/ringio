@@ -126,11 +126,6 @@ type Agent interface {
 	OutputFromRingbuf(stdout, errors, output *ringbuf.Ringbuf, filter *msg.Filter)
 }
 
-func (ac *Collection) inputToRingbuf(a Agent) {
-	a.InputToRingbuf(ac.errors, ac.output)
-	ac.waitFinish(a)
-}
-
 func (ac *Collection) isFilteringSinkAgents(filter *msg.Filter) bool {
 	if filter == nil {
 		return false
@@ -202,6 +197,11 @@ func (ac *Collection) validateFilter(self int, filter *msg.Filter) error {
 	}
 
 	return nil
+}
+
+func (ac *Collection) inputToRingbuf(a Agent) {
+	a.InputToRingbuf(ac.errors, ac.output)
+	ac.waitFinish(a)
 }
 
 func (ac *Collection) outputFromRingbuf(a Agent, filter *msg.Filter, filtersSinks bool) {

@@ -12,16 +12,18 @@ import (
 )
 
 type AgentCmd struct {
-	cmd      *exec.Cmd
-	meta     *AgentMetadata
-	cancelCh chan bool
+	cmd         *exec.Cmd
+	meta        *AgentMetadata
+	cancelInCh  chan bool
+	cancelOutCh chan bool
 }
 
 func NewAgentCmd(cmd []string, role AgentRole, filter *msg.Filter) *AgentCmd {
 	return &AgentCmd{
-		cmd:      exec.Command(cmd[0], cmd[1:]...),
-		meta:     &AgentMetadata{Role: role, Filter: filter},
-		cancelCh: make(chan bool),
+		cmd:         exec.Command(cmd[0], cmd[1:]...),
+		meta:        &AgentMetadata{Role: role, Filter: filter},
+		cancelInCh:  make(chan bool),
+		cancelOutCh: make(chan bool),
 	}
 }
 
@@ -44,32 +46,47 @@ func (a *AgentCmd) String() string {
 	return strings.Join(a.cmd.Args, " ")
 }
 
-func (a *AgentCmd) cancel() {
-	a.cancelCh <- true
-	a.cancelCh <- true
-
-	if a.meta.Role != AgentRoleSource {
-		a.cancelCh <- true
-	}
+func (a *AgentCmd) cancelReading() {
+	a.cancelInCh <- true // Stop reading from stderr
+	a.cancelInCh <- true // Stop reading from stdout
 }
 
 func (a *AgentCmd) Stop() error {
 	// Stop data pipes to this process.
 	if a.meta.Status.IsRunning() {
-		a.cancel()
+		if a.meta.Role == AgentRoleSink {
+			a.cancelOutCh <- true // Stop writing to this agent
+
+			// We don't cancel reading because a sink might still print
+			// useful information, for example aggregated results.
+		} else {
+			// In all other cases, stop reading immediately.
+			a.cancelReading()
+		}
 	}
 
+    // Subprocess should exit normally now, a successive Wait() will finish it.
+
 	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been stopped", a.meta.Id))
-
-	// Subprocess should exit normally now, a successive Wait() will finish it.
-
 	return nil
 }
 
 func (a *AgentCmd) Kill() error {
-	// Stop data pipes to this process.
+	// If the agent is running, we need to stop all goroutines that
+	// are reading from or writing to the agent.
 	if a.meta.Status.IsRunning() {
-		a.cancel()
+		a.cancelReading()
+
+		if a.meta.Role == AgentRoleSink {
+			a.cancelOutCh <- true
+		}
+	}
+
+	// An agent that was stopped only has a goroutine running.
+	if a.meta.Status == AgentStatusStopped {
+		if a.meta.Role == AgentRoleSink {
+			a.cancelOutCh <- true
+		}
 	}
 
 	if err := a.cmd.Process.Kill(); err != nil {
@@ -77,19 +94,14 @@ func (a *AgentCmd) Kill() error {
 	}
 
 	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been killed", a.meta.Id))
-
 	return nil
 }
 
 func (a *AgentCmd) WaitFinish() error {
-	if err := a.cmd.Wait(); err != nil {
-		return err
-	}
-
-	return nil
+	return a.cmd.Wait()
 }
 
-func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
+func (a *AgentCmd) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 	stdout, err := a.cmd.StdoutPipe()
 
 	if err != nil {
@@ -114,8 +126,8 @@ func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
 
-	go writeToRingbuf(id, stderr, errors, a.cancelCh, wg)
-	go writeToRingbuf(id, stdout, output, a.cancelCh, wg)
+	go writeToRingbuf(id, stderr, rErrors, a.cancelInCh, wg)
+	go writeToRingbuf(id, stdout, rOutput, a.cancelInCh, wg)
 
 	wg.Wait()
 
@@ -123,7 +135,8 @@ func (a *AgentCmd) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	stderr.Close()
 	stdout.Close()
 
-	close(a.cancelCh)
+	close(a.cancelInCh)
+	close(a.cancelOutCh)
 }
 
 func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
@@ -158,11 +171,12 @@ func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf,
 	wg := new(sync.WaitGroup)
 	wg.Add(3)
 
-	go writeToRingbuf(id, stdout, rStdout, a.cancelCh, wg)
-	go writeToRingbuf(id, stderr, rErrors, a.cancelCh, wg)
-	go readFromRingbuf(stdin, filter, rOutput, a.cancelCh, wg)
+	go writeToRingbuf(id, stdout, rStdout, a.cancelInCh, wg)
+	go writeToRingbuf(id, stderr, rErrors, a.cancelInCh, wg)
+	go readFromRingbuf(stdin, filter, rOutput, a.cancelOutCh, wg)
 
 	wg.Wait()
 
-	close(a.cancelCh)
+	close(a.cancelInCh)
+	close(a.cancelOutCh)
 }

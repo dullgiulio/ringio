@@ -17,7 +17,7 @@ $ ringio web-logs input tail -f /var/log/httpd/access_log
   - Add some output agents or get output on the terminal
 ```bash
 $ ringio web-logs output ./count-useragents
-$ ringio web-logs output ./count-pagehits
+$ ringio web-logs output wc -l
 $ ringio web-logs output # Will print to the console.
 ```
   - List agents for a session:
@@ -28,6 +28,9 @@ $ ringio web-logs list
 ```bash
 $ ringio web-logs log
 ```
+  - Stop the agent counting the lines:
+$ ringio web-logs stop %3
+
   - Close the session.
 ```bash
 $ ringio web-logs close
