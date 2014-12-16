@@ -26,8 +26,8 @@ $ ringio web-logs output # Will print to the console.
   - List agents for a session:
 ```bash
 $ ringio web-logs list
-1 R <- input tail -f /var/log/httpd/access_log
-2 R -> output ./count-useragents
+1 R <- tail -f /var/log/httpd/access_log
+2 R -> ./count-useragents
 3 R -> wc -l
 ```
   - See the internal log for the session:
@@ -47,6 +47,14 @@ $ ringio web-logs output %3
 ```bash
 $ ringio web-logs close
 ```
+
+### Filtering
+
+ - Input and output agents can be filtered by writing their ID:
+```bash
+$ ringio my-session output 3
+```
+   Will display the output of agent %3. To filter out, negate the ID of the agent (ex: -3).
 
 ### Installation
 
