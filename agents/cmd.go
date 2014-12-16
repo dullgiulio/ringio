@@ -65,7 +65,7 @@ func (a *AgentCmd) Stop() error {
 		}
 	}
 
-    // Subprocess should exit normally now, a successive Wait() will finish it.
+	// Subprocess should exit normally now, a successive Wait() will finish it.
 
 	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been stopped", a.meta.Id))
 	return nil

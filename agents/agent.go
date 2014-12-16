@@ -2,116 +2,12 @@ package agents
 
 import (
 	"fmt"
-    "time"
-	"bytes"
-    "strings"
+	"time"
 
 	"github.com/dullgiulio/ringbuf"
 	"github.com/dullgiulio/ringio/config"
 	"github.com/dullgiulio/ringio/msg"
 )
-
-type AgentType int
-
-const (
-	AgentTypeNull AgentType = iota
-	AgentTypeCmd
-	AgentTypePipe
-)
-
-func (t AgentType) String() string {
-    switch t {
-    case AgentTypeCmd:
-        return "$"
-    case AgentTypePipe:
-        return "|"
-    }
-
-    return "?"
-}
-
-type AgentStatus int
-
-const (
-	AgentStatusNone AgentStatus = iota
-	AgentStatusRunning
-	AgentStatusKilled
-	AgentStatusStopped
-	AgentStatusFinished
-)
-
-type AgentRole int
-
-const (
-	AgentRoleSink AgentRole = iota
-	AgentRoleSource
-	AgentRoleErrors
-	AgentRoleLog
-)
-
-func (r AgentRole) String() string {
-    switch r {
-    case AgentRoleSink:
-        return "->"
-    case AgentRoleSource:
-        return "<-"
-    case AgentRoleErrors:
-        return "&&"
-    case AgentRoleLog:
-        return "||"
-    }
-
-    return ""
-}
-
-func (r AgentRole) Text() string {
-    switch r {
-    case AgentRoleSink:
-        return "output"
-    case AgentRoleSource:
-        return "input"
-    case AgentRoleErrors:
-        return "errors"
-    case AgentRoleLog:
-        return "logs"
-    }
-
-    return ""
-}
-
-func (s AgentStatus) IsRunning() bool {
-	return s == AgentStatusRunning
-}
-
-func (s AgentStatus) String() string {
-	switch s {
-	case AgentStatusRunning:
-		return "R"
-	case AgentStatusStopped:
-		return "S"
-	case AgentStatusKilled:
-		return "K"
-	case AgentStatusFinished:
-		return "F"
-	}
-
-	return "?"
-}
-
-func (s AgentStatus) Text() string {
-    switch s {
-    case AgentStatusRunning:
-		return "running"
-	case AgentStatusStopped:
-		return "stopped"
-	case AgentStatusKilled:
-		return "killed"
-	case AgentStatusFinished:
-		return "finished"
-    }
-
-    return "none"
-}
 
 type AgentMetadata struct {
 	Id       int
@@ -120,61 +16,6 @@ type AgentMetadata struct {
 	Started  time.Time
 	Finished time.Time
 	Filter   *msg.Filter
-}
-
-type AgentDescr struct {
-	Args []string
-	Meta AgentMetadata
-	Type AgentType
-}
-
-func (a *AgentDescr) String() string {
-	var args string
-
-	if a.Type == AgentTypeCmd {
-		args = strings.Join(a.Args, " ")
-	} else if a.Type == AgentTypePipe {
-		args = "[pipe]"
-	}
-
-    filter := ""
-
-	if a.Meta.Role == AgentRoleSink &&
-		a.Meta.Filter != nil {
-		filter = fmt.Sprintf(" [%s]", a.Meta.Filter.String())
-	}
-
-	return fmt.Sprintf("%d %s %s%s %s",
-		a.Meta.Id, a.Meta.Status.String(), a.Meta.Role.String(), filter, args)
-}
-
-func (a *AgentDescr) Text() string {
-	var b bytes.Buffer
-    
-    dateFormat := "2006-01-02 15:04:05 -0700 MST"
-    descr := "[pipe]"
-
-    if a.Type == AgentTypeCmd {
-        descr = strings.Join(a.Args, " ")
-    }
-
-    fmt.Fprintf(&b, "%%%d %s agent\n", a.Meta.Id, a.Meta.Role.Text())
-    fmt.Fprintf(&b, "status: %s\n", a.Meta.Status.Text())
-    fmt.Fprintf(&b, "descr: %s\n", descr)
-
-	if a.Meta.Status != AgentStatusNone {
-		fmt.Fprintf(&b, "started: %s\n", a.Meta.Started.Format(dateFormat))
-	} else {
-        fmt.Fprintf(&b, "started: not started\n")
-    }
-
-	if a.Meta.Status == AgentStatusFinished {
-		fmt.Fprintf(&b, "finished: %s\n", a.Meta.Finished.Format(dateFormat))
-	} else {
-        fmt.Fprintf(&b, "finished: not finished\n")
-    }
-
-    return b.String()
 }
 
 type Agent interface {
