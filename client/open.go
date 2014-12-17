@@ -15,7 +15,7 @@ func NewCommandOpen() *CommandOpen {
 }
 
 func (c *CommandOpen) Help() string {
-	return `Run all processes`
+	return `Open a new session`
 }
 
 func (c *CommandOpen) Init(fs *flag.FlagSet) bool {

@@ -21,7 +21,7 @@ func NewCommandStop() *CommandStop {
 }
 
 func (c *CommandStop) Help() string {
-	return `List all agents`
+	return `Stop a specified agent by stop sending data to it`
 }
 
 func (c *CommandStop) Init(fs *flag.FlagSet) bool {

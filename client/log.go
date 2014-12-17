@@ -20,7 +20,7 @@ func NewCommandLog() *CommandLog {
 }
 
 func (c *CommandLog) Help() string {
-	return `Output data from the ringbuf.`
+	return `Print internal log`
 }
 
 func (c *CommandLog) Init(fs *flag.FlagSet) bool {

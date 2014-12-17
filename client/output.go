@@ -20,7 +20,7 @@ func NewCommandOutput() *CommandOutput {
 }
 
 func (c *CommandOutput) Help() string {
-	return `Output data from the ringbuf.`
+	return `Output data from the ringbuf`
 }
 
 func (c *CommandOutput) Init(fs *flag.FlagSet) bool {

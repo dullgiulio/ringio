@@ -20,7 +20,7 @@ func NewCommandIO() *CommandIO {
 }
 
 func (c *CommandIO) Help() string {
-	return `List all agents`
+	return `Open an input and an ouput session to current terminal`
 }
 
 func (c *CommandIO) Init(fs *flag.FlagSet) bool {

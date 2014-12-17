@@ -20,7 +20,7 @@ func NewCommandError() *CommandError {
 }
 
 func (c *CommandError) Help() string {
-	return `Output data gathered from the standard error (stderr).`
+	return `Output data gathered from the standard error (stderr)`
 }
 
 func (c *CommandError) Init(fs *flag.FlagSet) bool {

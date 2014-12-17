@@ -20,7 +20,7 @@ func NewCommandInput() *CommandInput {
 }
 
 func (c *CommandInput) Help() string {
-	return `Take data and writes it into the ringbuf.`
+	return `Reads data from stdin (and stderr for processes) and writes it into the ringbuf`
 }
 
 func (c *CommandInput) Init(fs *flag.FlagSet) bool {
