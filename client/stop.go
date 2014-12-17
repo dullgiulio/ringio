@@ -24,9 +24,9 @@ func (c *CommandStop) Help() string {
 	return `List all agents`
 }
 
-func (c *CommandStop) Init(fs *flag.FlagSet) error {
+func (c *CommandStop) Init(fs *flag.FlagSet) bool {
 	// nothing to do yet.
-	return nil
+	return false
 }
 
 func (c *CommandStop) Run(cli *Cli) error {

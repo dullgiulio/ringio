@@ -23,9 +23,9 @@ func (c *CommandIO) Help() string {
 	return `List all agents`
 }
 
-func (c *CommandIO) Init(fs *flag.FlagSet) error {
+func (c *CommandIO) Init(fs *flag.FlagSet) bool {
 	// nothing to do yet.
-	return nil
+	return false
 }
 
 func (c *CommandIO) Run(cli *Cli) error {

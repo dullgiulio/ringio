@@ -5,9 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"net/rpc"
+	"os"
 	"strconv"
 
 	"github.com/dullgiulio/ringio/msg"
+	"github.com/dullgiulio/ringio/onexit"
 	"github.com/dullgiulio/ringio/utils"
 )
 
@@ -30,7 +32,7 @@ const (
 
 type Client interface {
 	Help() string
-	Init(fs *flag.FlagSet) error
+	Init(fs *flag.FlagSet) bool
 	Run(cli *Cli) error
 }
 
@@ -74,19 +76,39 @@ func (cli *Cli) ParseArgs(args []string) error {
 		return nil
 	}
 
+	helpMode := false
+
 	cli.Session = args[1]
+
+	if cli.Session == "help" {
+		cli.Session = ""
+		helpMode = true
+	}
+
 	cli.CommandStr = args[2]
 	cli.Command = cmdCommand[cli.CommandStr]
 	cli.NArgs = args[3:]
-	cli.flagset = flag.NewFlagSet("ringio-"+cli.CommandStr, flag.ExitOnError)
+
+	cli.flagset = flag.NewFlagSet("`ringio "+cli.CommandStr+"'", flag.ExitOnError)
 	cli.client = cli.getClient()
 
 	if cli.client == nil {
 		return errors.New(fmt.Sprintf("Unsupported command %s", cli.CommandStr))
 	}
 
-	if err := cli.client.Init(cli.flagset); err != nil {
-		return err
+	haveArgs := cli.client.Init(cli.flagset)
+	if helpMode {
+		fmt.Fprintf(os.Stderr, "ringio: %s: ", cli.CommandStr)
+		fmt.Fprintf(os.Stderr, cli.client.Help())
+		fmt.Fprint(os.Stderr, "\n")
+
+		if haveArgs {
+			fmt.Fprintf(os.Stderr, "\nSupported options:\n\n")
+			cli.flagset.PrintDefaults()
+		}
+
+		fmt.Fprintf(os.Stderr, "\nRun `ringio' without argument to see basic usage information.\n")
+		onexit.Exit(1)
 	}
 
 	cli.Filter = cli.parseFilter(cli.NArgs)

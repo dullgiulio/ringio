@@ -24,9 +24,9 @@ func (c *CommandList) Help() string {
 	return `List all agents`
 }
 
-func (c *CommandList) Init(fs *flag.FlagSet) error {
+func (c *CommandList) Init(fs *flag.FlagSet) bool {
 	fs.BoolVar(&c.verbose, "verbose", false, "Long version of the list")
-	return nil
+	return true
 }
 
 func (c *CommandList) Run(cli *Cli) error {

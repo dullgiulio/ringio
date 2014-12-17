@@ -24,9 +24,9 @@ func (c *CommandKill) Help() string {
 	return `Kill a specified agent`
 }
 
-func (c *CommandKill) Init(fs *flag.FlagSet) error {
+func (c *CommandKill) Init(fs *flag.FlagSet) bool {
 	// nothing to do yet.
-	return nil
+	return false
 }
 
 func (c *CommandKill) Run(cli *Cli) error {

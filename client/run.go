@@ -23,9 +23,9 @@ func (c *CommandRun) Help() string {
 	return `Run all processes`
 }
 
-func (c *CommandRun) Init(fs *flag.FlagSet) error {
+func (c *CommandRun) Init(fs *flag.FlagSet) bool {
 	// nothing to do yet.
-	return nil
+	return false
 }
 
 func (c *CommandRun) Run(cli *Cli) error {

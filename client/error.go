@@ -23,9 +23,9 @@ func (c *CommandError) Help() string {
 	return `Output data gathered from the standard error (stderr).`
 }
 
-func (c *CommandError) Init(fs *flag.FlagSet) error {
+func (c *CommandError) Init(fs *flag.FlagSet) bool {
 	// nothing to do yet.
-	return nil
+	return false
 }
 
 func (c *CommandError) Run(cli *Cli) error {

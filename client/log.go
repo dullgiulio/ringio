@@ -23,9 +23,9 @@ func (c *CommandLog) Help() string {
 	return `Output data from the ringbuf.`
 }
 
-func (c *CommandLog) Init(fs *flag.FlagSet) error {
+func (c *CommandLog) Init(fs *flag.FlagSet) bool {
 	// nothing to do yet.
-	return nil
+	return false
 }
 
 func (c *CommandLog) Run(cli *Cli) error {
