@@ -294,20 +294,22 @@ func (c *Collection) Run(autorun bool) {
 			for _, a := range c.agents {
 				meta := a.Meta()
 
-				if meta.Status.IsRunning() {
-					// Kill running agents.
-					if err := a.Kill(); err != nil {
+				if !meta.Status.IsRunning() {
+					continue
+				}
+
+				// Kill running agents.
+				if err := a.Kill(); err != nil {
+					log.Error(log.FacilityAgent, err)
+				} else {
+					meta.Status = AgentStatusKilled
+
+					if err := a.WaitFinish(); err != nil {
 						log.Error(log.FacilityAgent, err)
-					} else {
-						meta.Status = AgentStatusKilled
-
-						if err := a.WaitFinish(); err != nil {
-							log.Error(log.FacilityAgent, err)
-						}
-
-						meta.Finished = time.Now()
-						meta.Status = AgentStatusFinished
 					}
+
+					meta.Finished = time.Now()
+					meta.Status = AgentStatusFinished
 				}
 			}
 
@@ -319,10 +321,12 @@ func (c *Collection) Run(autorun bool) {
 			for _, a := range c.agents {
 				meta := a.Meta()
 
-				if meta.Status == AgentStatusNone {
-					if err := c.runAgent(a); err != nil {
-						log.Error(log.FacilityAgent, err.Error())
-					}
+				if meta.Status != AgentStatusNone {
+					continue
+				}
+
+				if err := c.runAgent(a); err != nil {
+					log.Error(log.FacilityAgent, err.Error())
 				}
 			}
 
