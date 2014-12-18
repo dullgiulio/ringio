@@ -77,6 +77,8 @@ func (s *RpcServer) Add(req *RpcReq, result *int) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
+	var agent agents.Agent
+
 	if s.over {
 		return sessionOver
 	}
@@ -86,17 +88,31 @@ func (s *RpcServer) Add(req *RpcReq, result *int) error {
 
 	switch ag.Type {
 	case agents.AgentTypePipe:
-		s.ac.Add(agents.NewAgentPipe(ag.Args[0], ag.Meta.Role, ag.Meta.Filter), resp)
+		agent = agents.NewAgentPipe(ag.Args[0], ag.Meta.Role, ag.Meta.Filter)
 	case agents.AgentTypeCmd:
-		s.ac.Add(agents.NewAgentCmd(ag.Args, ag.Meta.Role, ag.Meta.Filter), resp)
+		agent = agents.NewAgentCmd(ag.Args, ag.Meta.Role, ag.Meta.Filter)
 	case agents.AgentTypeNull:
-		s.ac.Add(agents.NewAgentNull(0, ag.Meta.Role, ag.Meta.Filter), resp)
+		agent = agents.NewAgentNull(0, ag.Meta.Role, ag.Meta.Filter)
 	}
 
+	s.ac.Add(agent, resp)
+
 	i, err := resp.Get()
+	if err != nil {
+		return err
+	}
+
 	*result = i.(int)
 
-	return err
+	if config.C.AutoRun || ag.Type == agents.AgentTypePipe {
+		s.ac.Start(agent, &s.resp)
+
+		if _, err := s.resp.Get(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *RpcServer) List(req *RpcReq, result *agents.AgentMessageResponseList) error {
@@ -128,6 +144,22 @@ func (s *RpcServer) Run(req *RpcReq, result *RpcResp) error {
 	s.ac.StartAll(&s.resp)
 	s.resp.Get()
 
+	return nil
+}
+
+func (s *RpcServer) Start(id int, result *RpcResp) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	if s.over {
+		return sessionOver
+	}
+
+	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
+	s.ac.Start(na, &s.resp)
+	s.resp.Get()
+
+	*result = true
 	return nil
 }
 
