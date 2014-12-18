@@ -38,16 +38,13 @@ func help() int {
        ringio <session-name> io [%job...] [-%job...]
        ringio <session-name> run
        ringio <session-name> list
-       ringio <session-name> stop %job
-       ringio <session-name> kill %job
+       ringio <session-name> start %job...
+       ringio <session-name> stop %job...
+       ringio <session-name> kill %job...
        ringio <session-name> log
        ringio <session-name> close
 
-Type:
-
-       ringio help <command>
-
-for help on any command.
+Type 'ringio help <command>' for help on any command.
 `)
 	return 1
 }
