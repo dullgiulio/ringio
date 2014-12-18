@@ -18,7 +18,7 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 	p := pipe.New(pipeName)
 
 	if err := p.OpenWriteErr(); err != nil {
-		utils.Fatal(fmt.Errorf("Couldn't open pipe for writing: %s", err))
+		utils.Fatal(err)
 	}
 
 	if err := client.Call("RpcServer.Add", &server.RpcReq{

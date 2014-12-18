@@ -26,6 +26,7 @@ const (
 	Open
 	Close
 	List
+	Start
 	Stop
 	Kill
 )
@@ -67,6 +68,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 		"close":  Close,
 		"list":   List,
 		"ls":     List,
+		"start":  Start,
 		"stop":   Stop,
 		"kill":   Kill,
 	}
@@ -184,6 +186,8 @@ func (cli *Cli) getClient() Client {
 		return NewCommandClose()
 	case List:
 		return NewCommandList()
+	case Start:
+		return NewCommandStart()
 	case Stop:
 		return NewCommandStop()
 	case Kill:
