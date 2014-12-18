@@ -92,7 +92,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 	cli.NArgs = args[3:]
 
 	cli.flagset = flag.NewFlagSet("`ringio "+cli.CommandStr+"'", flag.ExitOnError)
-	cli.client = cli.getClient()
+	cli.client = cli.getCommand()
 
 	if cli.client == nil {
 		return errors.New(fmt.Sprintf("Unsupported command %s", cli.CommandStr))
@@ -162,7 +162,7 @@ func (cli *Cli) parseFilter(args []string) (f *msg.Filter) {
 	return
 }
 
-func (cli *Cli) getClient() Client {
+func (cli *Cli) getCommand() Client {
 	if cli.Command == None {
 		return nil
 	}

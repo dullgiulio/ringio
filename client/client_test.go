@@ -79,62 +79,62 @@ func TestFilterArgs(t *testing.T) {
 
 func TestCorrectClient(t *testing.T) {
 	cli := NewCli()
-	c := cli.getClient()
+	c := cli.getCommand()
 
 	if c != nil {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Output
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandOutput); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Input
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandInput); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = IO
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandIO); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Log
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandLog); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Run
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandRun); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Open
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandOpen); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Close
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandClose); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = List
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandList); !ok {
 		t.Error("Invalid client instance")
 	}
 
 	cli.Command = Stop
-	c = cli.getClient()
+	c = cli.getCommand()
 	if _, ok := c.(*CommandStop); !ok {
 		t.Error("Invalid client instance")
 	}
