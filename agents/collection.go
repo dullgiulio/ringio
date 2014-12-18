@@ -22,12 +22,13 @@ type messageType int
 
 const (
 	agentMessageAdd messageType = iota
+	agentMessageStart
 	agentMessageStop
 	agentMessageKill
 	agentMessageFinished
 	agentMessageRunning
 	agentMessageList
-	agentMessageAutorun
+	agentMessageStartAll
 	agentMessageCancel
 )
 
@@ -71,8 +72,12 @@ func (c *Collection) Add(a Agent, response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageAdd, response, a)
 }
 
+func (c *Collection) Start(a Agent, response AgentMessageResponse) {
+	c.requestCh <- newAgentMessage(agentMessageStart, response, a)
+}
+
 func (c *Collection) StartAll(response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageAutorun, response, nil)
+	c.requestCh <- newAgentMessage(agentMessageStartAll, response, nil)
 }
 
 func (c *Collection) SetAgentStatusFinished(a Agent, response AgentMessageResponse) {
@@ -163,7 +168,7 @@ func (c *Collection) getRealAgent(agent Agent) Agent {
 	meta := agent.Meta()
 
 	for _, a := range c.agents {
-		if a.Meta().Id == meta.Id {
+		if a == agent || a.Meta().Id == meta.Id {
 			realAgent = a
 			break
 		}
@@ -232,6 +237,24 @@ func (c *Collection) stopOrKillAgent(msg agentMessage, kill bool) {
 	}
 }
 
+func (c *Collection) startAgent(agent Agent) error {
+	meta := agent.Meta()
+
+	switch meta.Status {
+	case AgentStatusKilled, AgentStatusStopped, AgentStatusRunning:
+		return fmt.Errorf("Agent %d is already running", meta.Id)
+	}
+
+	agent.Init()
+
+	if err := c.runAgent(agent); err != nil {
+		return err
+	}
+
+	log.Info(log.FacilityAgent, fmt.Sprintf("Started agent %d", meta.Id))
+	return nil
+}
+
 func (c *Collection) Run(autorun bool) {
 	go c.errors.Run()
 	go c.output.Run()
@@ -244,23 +267,28 @@ func (c *Collection) Run(autorun bool) {
 
 			log.Info(log.FacilityAgent, "Added new agent", msg.agent)
 
-			if autorun {
-				msg.agent.Init()
-
-				if err := c.runAgent(msg.agent); err != nil {
-					msg.response.Err(err)
-					continue
-				}
-
-				log.Debug(log.FacilityAgent, "New agent started automatically")
-			}
-
 			msg.response.Data(id)
 			msg.response.Ok()
 		case agentMessageKill:
 			c.stopOrKillAgent(msg, true)
 		case agentMessageStop:
 			c.stopOrKillAgent(msg, false)
+		case agentMessageStart:
+			realAgent := c.getRealAgent(msg.agent)
+
+			if realAgent == nil {
+				err := fmt.Errorf("Agent %d not found", msg.agent.Meta().Id)
+				log.Error(log.FacilityAgent, err)
+				msg.response.Err(err)
+				continue
+			}
+
+			if err := c.startAgent(realAgent); err != nil {
+				log.Error(log.FacilityAgent, err)
+				msg.response.Err(err)
+			} else {
+				msg.response.Ok()
+			}
 		case agentMessageCancel:
 			// Kill all outstanding processes.
 			for _, a := range c.agents {
@@ -286,15 +314,7 @@ func (c *Collection) Run(autorun bool) {
 			c.Close()
 			msg.response.Ok()
 			return
-		case agentMessageAutorun:
-			if autorun {
-				// If we are already in autorun, ignore this message.
-				msg.response.Ok()
-				continue
-			}
-
-			autorun = true
-
+		case agentMessageStartAll:
 			// Start all agents that haven't been started yet.
 			for _, a := range c.agents {
 				meta := a.Meta()

@@ -45,12 +45,12 @@ func TestAgentAdding(t *testing.T) {
 		t.Error("Adding an agent changed its role")
 	}
 
-	if meta.Status != AgentStatusRunning {
-		t.Error("Expected agent to be in running state")
+	if meta.Status == AgentStatusRunning {
+		t.Error("Did not expected agent to be in running state")
 	}
 
-	if meta.Started.IsZero() {
-		t.Error("Expected starting time to be set")
+	if !meta.Started.IsZero() {
+		t.Error("Did not expected starting time to be set")
 	}
 
 	if !meta.Finished.IsZero() {
@@ -61,6 +61,9 @@ func TestAgentAdding(t *testing.T) {
 	resp = NewAgentMessageResponseBool()
 
 	ac.Add(a1, &resp)
+	resp.Get()
+
+	ac.Start(a1, &resp)
 	resp.Get()
 
 	meta = a1.Meta()
@@ -88,6 +91,9 @@ func TestAgentAdding(t *testing.T) {
 	if !meta.Finished.IsZero() {
 		t.Error("Expected finish time to be still undefined")
 	}
+
+	ac.Start(a0, &resp)
+	resp.Get()
 
 	ac.Cancel(&resp)
 	resp.Get()
