@@ -1,9 +1,5 @@
-* Improve logging
-
 * ringio -ls -> dislays all sessions
 * ringio -k <session-name> -> forbicly remove a session socket
-
-* various flags, especially for main conf.
 
 * seekable ringbuf (reader can seek to beginning or end)
 
