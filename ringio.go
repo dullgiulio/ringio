@@ -23,14 +23,14 @@ func main() {
 
 	if cli.Session == "" {
 		help()
-	} else {
-		cli.Run()
+		onexit.Exit(1)
 	}
 
+	cli.Run()
 	onexit.Exit(0)
 }
 
-func help() int {
+func help() {
 	fmt.Print(
 		`Usage: ringio <session-name> open &
        ringio <session-name> in|input [%job...] [-%job...] [COMMAND...]
@@ -46,5 +46,4 @@ func help() int {
 
 Type 'ringio help <command>' for help on any command.
 `)
-	return 1
 }
