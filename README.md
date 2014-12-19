@@ -64,5 +64,4 @@ You need the Go lang development environment installed and set up:
 $ go build github.org/dullgiulio/ringio
 ```
 
-Downloads will be available soon.
-
+Please see [the releases page](https://github.com/dullgiulio/ringio/releases) for further information.
