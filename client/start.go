@@ -12,6 +12,7 @@ import (
 type CommandStart struct {
 	client   *rpc.Client
 	response *server.RpcResp
+	startAll bool
 }
 
 func NewCommandStart() *CommandStart {
@@ -25,13 +26,11 @@ func (c *CommandStart) Help() string {
 }
 
 func (c *CommandStart) Init(fs *flag.FlagSet) bool {
-	// nothing to do yet.
-	return false
+	fs.BoolVar(&c.startAll, "all", false, "Start all that has never been started")
+	return true
 }
 
-func (c *CommandStart) Run(cli *Cli) error {
-	c.client = cli.GetClient()
-
+func (c *CommandStart) agent(cli *Cli) {
 	argsErr := errors.New("Start must be followed by an argument.")
 
 	if cli.Filter == nil {
@@ -48,6 +47,26 @@ func (c *CommandStart) Run(cli *Cli) error {
 		if err := c.client.Call("RpcServer.Start", id, &c.response); err != nil {
 			utils.Error(err)
 		}
+	}
+}
+
+func (c *CommandStart) all(cli *Cli) {
+	if cli.Filter != nil {
+		utils.Fatal(errors.New("Filtering when --all is specified makes no sense."))
+	}
+
+	if err := c.client.Call("RpcServer.StartAll", &server.RpcReq{}, &c.response); err != nil {
+		utils.Fatal(err)
+	}
+}
+
+func (c *CommandStart) Run(cli *Cli) error {
+	c.client = cli.GetClient()
+
+	if c.startAll {
+		c.all(cli)
+	} else {
+		c.agent(cli)
 	}
 
 	return nil

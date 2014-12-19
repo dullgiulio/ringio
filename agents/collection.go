@@ -26,7 +26,6 @@ const (
 	agentMessageStop
 	agentMessageKill
 	agentMessageFinished
-	agentMessageRunning
 	agentMessageList
 	agentMessageStartAll
 	agentMessageCancel
@@ -80,20 +79,16 @@ func (c *Collection) StartAll(response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageStartAll, response, nil)
 }
 
-func (c *Collection) SetAgentStatusFinished(a Agent, response AgentMessageResponse) {
+func (c *Collection) Finished(a Agent, response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageFinished, response, a)
 }
 
-func (c *Collection) SetAgentStatusKill(a Agent, response AgentMessageResponse) {
+func (c *Collection) Kill(a Agent, response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageKill, response, a)
 }
 
-func (c *Collection) SetAgentStatusStop(a Agent, response AgentMessageResponse) {
+func (c *Collection) Stop(a Agent, response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageStop, response, a)
-}
-
-func (c *Collection) SetAgentStatusRunning(a Agent, response AgentMessageResponse) {
-	c.requestCh <- newAgentMessage(agentMessageRunning, response, a)
 }
 
 func (c *Collection) List(response AgentMessageResponse) {
@@ -185,7 +180,7 @@ func (c *Collection) waitFinish(agent Agent) {
 
 	// We signal back to the collection that this agents is finished.
 	resp := NewAgentMessageResponseBool()
-	c.SetAgentStatusFinished(agent, &resp)
+	c.Finished(agent, &resp)
 
 	if _, err := resp.Get(); err != nil {
 		log.Error(log.FacilityAgent, fmt.Sprintf("Error cleaning up %d: %s", agent.Meta().Id, err))

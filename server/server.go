@@ -147,6 +147,21 @@ func (s *RpcServer) Run(req *RpcReq, result *RpcResp) error {
 	return nil
 }
 
+func (s *RpcServer) StartAll(req *RpcReq, result *RpcResp) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	if s.over {
+		return sessionOver
+	}
+
+	s.ac.StartAll(&s.resp)
+	s.resp.Get()
+
+	*result = true
+	return nil
+}
+
 func (s *RpcServer) Start(id int, result *RpcResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -172,7 +187,7 @@ func (s *RpcServer) Stop(id int, result *RpcResp) error {
 	}
 
 	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
-	s.ac.SetAgentStatusStop(na, &s.resp)
+	s.ac.Stop(na, &s.resp)
 	s.resp.Get()
 
 	*result = true
@@ -188,7 +203,7 @@ func (s *RpcServer) Kill(id int, result *RpcResp) error {
 	}
 
 	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
-	s.ac.SetAgentStatusKill(na, &s.resp)
+	s.ac.Kill(na, &s.resp)
 	s.resp.Get()
 
 	*result = true
