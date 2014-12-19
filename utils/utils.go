@@ -13,7 +13,7 @@ var _letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234
 
 func getBasepath(home string) string {
 	if home == "" {
-		return path.Join("/tmp", ".ringio-"+os.Getenv("USER"))
+		return path.Join(os.TempDir(), ".ringio-"+os.Getenv("USER"))
 	} else {
 		return path.Join(home, ".ringio")
 	}
