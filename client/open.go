@@ -22,7 +22,7 @@ func (c *CommandOpen) Init(fs *flag.FlagSet) bool {
 	fs.Int64Var(&config.C.RingbufSize, "ringbuf-size", config.C.RingbufSize, "Max number of lines contained in a ringbuffer")
 	fs.Int64Var(&config.C.MaxLineSize, "line-size", config.C.MaxLineSize, "Max size in bytes of a single line read from stdin")
 	fs.Int64Var(&config.C.RingbufLogSize, "ringbuf-log-size", config.C.RingbufSize, "Max number of lines for log scrollback")
-	fs.BoolVar(&config.C.AutoRun, "autorun", config.C.AutoRun, "Automatically run new commands when added")
+	fs.BoolVar(&config.C.AutoRun, "autostart", config.C.AutoRun, "Automatically run new commands when added")
 	fs.BoolVar(&config.C.PrintLog, "verbose", config.C.PrintLog, "Print logging on the command line")
 	return true
 }
