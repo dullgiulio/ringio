@@ -88,11 +88,11 @@ func (s *RpcServer) Add(req *RpcReq, result *int) error {
 
 	switch ag.Type {
 	case agents.AgentTypePipe:
-		agent = agents.NewAgentPipe(ag.Args[0], ag.Meta.Role, ag.Meta.Filter)
+		agent = agents.NewAgentPipe(ag.Args[0], ag.Meta.Role, ag.Meta.Filter, ag.Meta.Options)
 	case agents.AgentTypeCmd:
-		agent = agents.NewAgentCmd(ag.Args, ag.Meta.Role, ag.Meta.Filter)
+		agent = agents.NewAgentCmd(ag.Args, ag.Meta.Role, ag.Meta.Filter, ag.Meta.Options)
 	case agents.AgentTypeNull:
-		agent = agents.NewAgentNull(0, ag.Meta.Role, ag.Meta.Filter)
+		agent = agents.NewAgentNull(0, ag.Meta.Role, ag.Meta.Filter, ag.Meta.Options)
 	}
 
 	s.ac.Add(agent, resp)
@@ -170,7 +170,7 @@ func (s *RpcServer) Start(id int, result *RpcResp) error {
 		return sessionOver
 	}
 
-	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
+	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil, &agents.AgentOptions{}) // Role is unimportant here.
 	s.ac.Start(na, &s.resp)
 	s.resp.Get()
 
@@ -186,7 +186,7 @@ func (s *RpcServer) Stop(id int, result *RpcResp) error {
 		return sessionOver
 	}
 
-	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
+	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil, &agents.AgentOptions{}) // Role is unimportant here.
 	s.ac.Stop(na, &s.resp)
 	s.resp.Get()
 
@@ -202,7 +202,7 @@ func (s *RpcServer) Kill(id int, result *RpcResp) error {
 		return sessionOver
 	}
 
-	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil) // Role is unimportant here.
+	na := agents.NewAgentNull(id, agents.AgentRoleSink, nil, &agents.AgentOptions{}) // Role is unimportant here.
 	s.ac.Kill(na, &s.resp)
 	s.resp.Get()
 
