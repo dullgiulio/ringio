@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/rpc"
 
+	"github.com/dullgiulio/ringio/agents"
 	"github.com/dullgiulio/ringio/server"
 	"github.com/dullgiulio/ringio/utils"
 )
@@ -31,7 +32,7 @@ func (c *CommandError) Init(fs *flag.FlagSet) bool {
 func (c *CommandError) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	addErrorsAgentPipe(c.client, cli.Filter, c.response, utils.GetRandomDotfile())
+	addErrorsAgentPipe(c.client, &agents.AgentMetadata{Filter: cli.Filter}, c.response, utils.GetRandomDotfile())
 
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/rpc"
 
+	"github.com/dullgiulio/ringio/agents"
 	"github.com/dullgiulio/ringio/server"
 	"github.com/dullgiulio/ringio/utils"
 )
@@ -32,7 +33,7 @@ func (c *CommandIO) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
 	go addSourceAgentPipe(c.client, c.response, utils.GetRandomDotfile())
-	addSinkAgentPipe(c.client, cli.Filter, c.response, utils.GetRandomDotfile())
+	addSinkAgentPipe(c.client, &agents.AgentMetadata{Filter: cli.Filter}, c.response, utils.GetRandomDotfile())
 
 	return nil
 }
