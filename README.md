@@ -40,7 +40,7 @@ $ ringio web-logs stop %3
 ```
   - Retrieve 'wc -l' output (you can see any output by filtering it explicitly):
 ```bash
-$ ringio web-logs output %3
+$ ringio web-logs output %3 -no-wait
 4526
 ```
   - Close the session.
