@@ -24,6 +24,10 @@ func NewAgentPipe(pipeName string, role AgentRole, filter *msg.Filter, options *
 }
 
 func (a *AgentPipe) Init() {
+	if a.meta.Options == nil {
+		a.meta.Options = &AgentOptions{}
+	}
+
 	if a.meta.Role == AgentRoleSink ||
 		a.meta.Role == AgentRoleErrors ||
 		a.meta.Role == AgentRoleLog {
@@ -100,7 +104,8 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 }
 
 func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
-	cancelled := readFromRingbuf(a.pipe, filter, rOutput, a.cancelCh, nil)
+	cancelled := readFromRingbuf(a.pipe, filter, rOutput,
+		makeReaderOptions(a.meta.Options), a.cancelCh, nil)
 
 	if !cancelled {
 		<-a.cancelCh

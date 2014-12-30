@@ -28,6 +28,9 @@ func NewAgentCmd(cmd []string, role AgentRole, filter *msg.Filter, options *Agen
 }
 
 func (a *AgentCmd) Init() {
+	if a.meta.Options == nil {
+		a.meta.Options = &AgentOptions{}
+	}
 }
 
 func (a *AgentCmd) Meta() *AgentMetadata {
@@ -173,7 +176,7 @@ func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf,
 
 	go writeToRingbuf(id, stdout, rStdout, a.cancelInCh, wg)
 	go writeToRingbuf(id, stderr, rErrors, a.cancelInCh, wg)
-	go readFromRingbuf(stdin, filter, rOutput, a.cancelOutCh, wg)
+	go readFromRingbuf(stdin, filter, rOutput, makeReaderOptions(a.meta.Options), a.cancelOutCh, wg)
 
 	wg.Wait()
 

@@ -22,6 +22,9 @@ func (a *AgentNull) Meta() *AgentMetadata {
 }
 
 func (a *AgentNull) Init() {
+	if a.meta.Options == nil {
+		a.meta.Options = &AgentOptions{}
+	}
 }
 
 func (a *AgentNull) Descr() AgentDescr {
