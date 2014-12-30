@@ -19,6 +19,13 @@ type AgentMetadata struct {
 	Options  *AgentOptions
 }
 
+func NewAgentMetadata() *AgentMetadata {
+	return &AgentMetadata{
+		Filter:  new(msg.Filter),
+		Options: new(AgentOptions),
+	}
+}
+
 type AgentOptions struct {
 	NoWait bool
 }
