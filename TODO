@@ -1,3 +1,5 @@
+* -no-wait is currently not working with pipes.
+
 * ringio -ls -> dislays all sessions
 * ringio -k <session-name> -> forbicly remove a session socket
 
