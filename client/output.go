@@ -12,11 +12,13 @@ import (
 type CommandOutput struct {
 	client   *rpc.Client
 	response *server.RpcResp
+	meta     *agents.AgentMetadata
 }
 
 func NewCommandOutput() *CommandOutput {
 	return &CommandOutput{
 		response: new(server.RpcResp),
+		meta:     agents.NewAgentMetadata(),
 	}
 }
 
@@ -25,19 +27,19 @@ func (c *CommandOutput) Help() string {
 }
 
 func (c *CommandOutput) Init(fs *flag.FlagSet) bool {
-	// nothing to do yet.
-	return false
+	fs.BoolVar(&c.meta.Options.NoWait, "no-wait", false, "Don't wait for future output, exit when finished dumping past data")
+	return true
 }
 
 func (c *CommandOutput) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	meta := &agents.AgentMetadata{Filter: cli.Filter}
+	c.meta.Filter = cli.Filter
 
 	if len(cli.Args) == 0 {
-		addSinkAgentPipe(c.client, meta, c.response, utils.GetRandomDotfile())
+		addSinkAgentPipe(c.client, c.meta, c.response, utils.GetRandomDotfile())
 	} else {
-		addSinkAgentCmd(c.client, meta, c.response, cli.Args)
+		addSinkAgentCmd(c.client, c.meta, c.response, cli.Args)
 	}
 
 	return nil
