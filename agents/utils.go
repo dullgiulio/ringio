@@ -11,6 +11,18 @@ import (
 	"github.com/dullgiulio/ringio/msg"
 )
 
+func makeReaderOptions(opts *AgentOptions) *ringbuf.ReaderOptions {
+	ropts := &ringbuf.ReaderOptions{}
+
+	if opts != nil {
+		if opts.NoWait {
+			ropts.NoStarve = true
+		}
+	}
+
+	return ropts
+}
+
 // TODO: Must make this terminate somehow.
 func writeToChan(c chan<- []byte, cancel chan bool, reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
@@ -92,12 +104,18 @@ func _readInnerLoop(c <-chan interface{}, cancel <-chan bool,
 }
 
 func readFromRingbuf(writer io.WriteCloser, filter *msg.Filter,
-	ring *ringbuf.Ringbuf, cancel <-chan bool, wg *sync.WaitGroup) (cancelled bool) {
+	ring *ringbuf.Ringbuf, readerOpts *ringbuf.ReaderOptions,
+	cancel <-chan bool, wg *sync.WaitGroup) (cancelled bool) {
 	if wg != nil {
 		defer wg.Done()
 	}
 
 	reader := ringbuf.NewReader(ring)
+
+	if readerOpts != nil {
+		reader.SetOptions(readerOpts)
+	}
+
 	output := bufio.NewWriter(writer)
 	c := reader.ReadCh()
 
