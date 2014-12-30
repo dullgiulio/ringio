@@ -10,14 +10,6 @@ import (
 	"github.com/dullgiulio/ringio/log"
 )
 
-type CollectionRingType int
-
-const (
-	CollectionRingTypeErrors CollectionRingType = iota
-	CollectionRingTypeStdout
-	CollectionRingTypeOutput
-)
-
 type messageType int
 
 const (
@@ -93,22 +85,6 @@ func (c *Collection) Stop(a Agent, response AgentMessageResponse) {
 
 func (c *Collection) List(response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageList, response, nil)
-}
-
-func (c *Collection) Reader(which CollectionRingType) <-chan interface{} {
-	var r *ringbuf.Ringbuf
-
-	switch which {
-	case CollectionRingTypeErrors:
-		r = c.errors
-	case CollectionRingTypeStdout:
-		r = c.stdout
-	case CollectionRingTypeOutput:
-		r = c.output
-	}
-
-	reader := ringbuf.NewReader(r)
-	return reader.ReadCh()
 }
 
 func (c *Collection) add(newAgent Agent) int {
