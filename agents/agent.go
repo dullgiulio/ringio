@@ -16,6 +16,11 @@ type AgentMetadata struct {
 	Started  time.Time
 	Finished time.Time
 	Filter   *msg.Filter
+	Options  *AgentOptions
+}
+
+type AgentOptions struct {
+	NoWait bool
 }
 
 type Agent interface {
