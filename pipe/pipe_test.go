@@ -21,6 +21,9 @@ func TestCreatePipe(t *testing.T) {
 	}()
 
 	p := New(pipeName)
+	if err := p.Create(); err != nil {
+		t.Error(err)
+	}
 	if ok := p.OpenWrite(); !ok {
 		t.Log("Did not expect OpenWrite to fail")
 		t.Fail()

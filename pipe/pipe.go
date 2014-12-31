@@ -38,12 +38,15 @@ func (p *Pipe) OpenWrite() bool {
 	return true
 }
 
-func (p *Pipe) OpenWriteErr() error {
-	// XXX: File creation exploits are possible here. Woooohooo.
+func (p *Pipe) Create() error {
 	if err := syscall.Mknod(p.filename, syscall.S_IFIFO|0600, 0); err != nil {
 		return fmt.Errorf("Creating pipe for write failed: %s", err)
 	}
 
+	return nil
+}
+
+func (p *Pipe) OpenWriteErr() error {
 	file, err := os.OpenFile(p.filename, os.O_RDWR|os.O_APPEND, 0600)
 	if err != nil {
 		return fmt.Errorf("Opening pipe for writing failed: %s", err)
