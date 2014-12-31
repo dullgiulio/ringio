@@ -113,23 +113,18 @@ func (cli *Cli) ParseArgs(args []string) error {
 		onexit.Exit(1)
 	}
 
-	cli.Filter = cli.parseFilter(cli.NArgs)
+	cli.NArgs, cli.Args = cli.parseOptions(cli.NArgs)
 
 	if err := cli.flagset.Parse(cli.NArgs); err != nil {
 		return err
 	}
 
-	n := cli.flagset.NArg()
-
-	// For us, what is parsed and not as the opposite meaning.
-	cli.Args = cli.NArgs[len(cli.NArgs)-n:]
-	cli.NArgs = cli.NArgs[0 : len(cli.NArgs)-n]
-
 	return nil
 }
 
-func (cli *Cli) parseFilter(args []string) (f *msg.Filter) {
-	skipped := 0
+// XXX: "-option arg" is not accepted, but only "-option=arg".
+func (cli *Cli) parseOptions(args []string) ([]string, []string) {
+	nargs := make([]string, 0)
 
 	for i := range args {
 		arg := args[i]
@@ -139,27 +134,24 @@ func (cli *Cli) parseFilter(args []string) (f *msg.Filter) {
 		}
 
 		if d, err := strconv.Atoi(arg); err == nil {
-			if skipped == 0 {
-				f = msg.NewFilter()
+			if cli.Filter == nil {
+				cli.Filter = msg.NewFilter()
 			}
 
 			if d < 0 {
-				f.Out(-d)
+				cli.Filter.Out(-d)
 			} else {
-				f.In(d)
+				cli.Filter.In(d)
 			}
-
-			skipped++
+		} else if args[i][0] == '-' {
+			// It's a command argument
+			nargs = append(nargs, args[i])
 		} else {
-			break
+			return nargs, args[i:]
 		}
 	}
 
-	if skipped > 0 {
-		cli.NArgs = cli.NArgs[skipped:]
-	}
-
-	return
+	return nargs, []string{}
 }
 
 func (cli *Cli) getCommand() Client {

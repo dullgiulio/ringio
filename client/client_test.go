@@ -21,7 +21,7 @@ func TestArgsParsing(t *testing.T) {
 		t.Error("Expected 'input' as command name")
 	}
 
-	err = cli.ParseArgs([]string{"ringio", "session-name", "output", "tail", "-f", "/some/file"})
+	err = cli.ParseArgs([]string{"ringio", "session-name", "output", "-no-wait", "tail", "-f", "/some/file"})
 
 	if err != nil {
 		t.Error(err)
@@ -36,7 +36,11 @@ func TestArgsParsing(t *testing.T) {
 		t.Error("Expected 'session-name' as session name")
 	}
 
-	if len(cli.NArgs) != 0 {
+	if len(cli.NArgs) != 1 {
+		t.Error("Expected all arguments to be parsed")
+	}
+
+	if cli.NArgs[0] != "-no-wait" {
 		t.Error("Expected all arguments to be parsed")
 	}
 
@@ -49,31 +53,65 @@ func TestArgsParsing(t *testing.T) {
 
 func TestFilterArgs(t *testing.T) {
 	cli := NewCli()
-	err := cli.ParseArgs([]string{"ringio", "session-name", "output", "%1", "%-2", "4", "-3", "command", "cmdarg"})
-
-	if err != nil {
-		t.Error(err)
-		t.Fail()
-	}
-
-	if cli.Session != "session-name" {
-		t.Error("Expected 'session-name' as session name")
-	}
-
-	if cli.CommandStr != "output" {
-		t.Error("Expected 'input' as command name")
-	}
+	nargs, args := cli.parseOptions([]string{
+		"-my-arg", "%1", "%-2", "-other-arg", "4", "-3", "-last-arg", "command", "-cmdarg"})
 
 	if cli.Filter.String() != "1,4,-2,-3" {
 		t.Error("Expected '1,4,-2,-3' as filter")
 	}
 
-	if cli.Args[0] != "command" {
+	if nargs[0] != "-my-arg" {
+		t.Error("NArgs don't start properly")
+	}
+
+	if nargs[1] != "-other-arg" {
+		t.Error("NArgs not parsed in the middle")
+	}
+
+	if nargs[2] != "-last-arg" {
+		t.Error("NArgs not parsed in last position")
+	}
+
+	if args[0] != "command" {
 		t.Error("Args don't start properly")
 	}
 
-	if cli.Args[1] != "cmdarg" {
+	if args[1] != "-cmdarg" {
 		t.Error("Args don't finish properly")
+	}
+}
+
+func TestArgsAndFilterAfter(t *testing.T) {
+	cli := NewCli()
+	nargs, args := cli.parseOptions([]string{"-my-arg", "%1"})
+
+	if cli.Filter.String() != "1" {
+		t.Error("Expected '1' as filter")
+	}
+
+	if nargs[0] != "-my-arg" {
+		t.Error("NArgs don't start properly")
+	}
+
+	if len(args) > 0 {
+		t.Error("Args are not empty as expected")
+	}
+}
+
+func TestArgsAndFilterBefore(t *testing.T) {
+	cli := NewCli()
+	nargs, args := cli.parseOptions([]string{"%1", "-my-arg"})
+
+	if cli.Filter.String() != "1" {
+		t.Error("Expected '1' as filter")
+	}
+
+	if nargs[0] != "-my-arg" {
+		t.Error("NArgs don't start properly")
+	}
+
+	if len(args) > 0 {
+		t.Error("Args are not empty as expected")
 	}
 }
 
