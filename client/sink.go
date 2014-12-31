@@ -25,6 +25,12 @@ func addLogAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName stri
 	_addSinkAgentPipe(client, &agents.AgentMetadata{}, response, pipeName, agents.AgentRoleLog)
 }
 
+func _removePipe(p *pipe.Pipe) {
+    if err := p.Remove(); err != nil {
+        utils.Error(err)
+    }
+}
+
 func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 	response *server.RpcResp, pipeName string, role agents.AgentRole) {
 	var id int
@@ -37,20 +43,20 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 		utils.Fatal(fmt.Errorf("Couldn't create pipe: %s", err))
 	}
 
-	defer p.Remove()
-
 	done := make(chan struct{})
 
 	go func(done chan struct{}) {
 		// Open will block until the pipe is opened on the other side.
 		if err := p.OpenReadErr(); err != nil {
-			utils.Fatal(fmt.Errorf("Couldn't open pipe for reading: %s", err))
+			_removePipe(p)
+            utils.Fatal(fmt.Errorf("Couldn't open pipe for reading: %s", err))
 		}
 
 		r := bufio.NewReader(p)
 
 		if _, err := r.WriteTo(os.Stdout); err != nil {
-			utils.Fatal(err)
+			_removePipe(p)
+            utils.Fatal(err)
 		}
 
 		done <- struct{}{}
@@ -63,17 +69,23 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 			Type: agents.AgentTypePipe,
 		},
 	}, &id); err != nil {
+        _removePipe(p)
 		utils.Fatal(err)
 	}
 
 	onexit.Defer(func() {
 		if err := client.Call("RpcServer.Stop", id, &response); err != nil {
-			utils.Fatal(err)
+			_removePipe(p)
+            utils.Fatal(err)
 		}
 	})
 
 	// Wait for the pipe to be read.
 	<-done
+
+    if err := p.Remove(); err != nil {
+        utils.Fatal(err)
+    }
 }
 
 func addErrorsAgentCmd(client *rpc.Client, meta *agents.AgentMetadata, response *server.RpcResp, args []string) {
