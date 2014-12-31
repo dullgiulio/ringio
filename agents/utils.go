@@ -124,7 +124,11 @@ func readFromRingbuf(writer io.WriteCloser, filter *msg.Filter,
 	reader.Cancel()
 	writer.Close()
 
-	log.Debug(log.FacilityAgent, "Read from ringbuf has been cancelled")
+	if cancelled {
+		log.Debug(log.FacilityAgent, "Read from ringbuf has been cancelled")
+	} else {
+		log.Debug(log.FacilityAgent, "Read from ringbuf terminated")
+	}
 
 	return
 }
