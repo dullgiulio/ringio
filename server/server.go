@@ -55,7 +55,7 @@ func Init() {
 	log.AddWriter(lw)
 }
 
-func Run(sessionName string) (returnStatus int) {
+func Run(logLevel log.Level, sessionName string) (returnStatus int) {
 	socket := utils.FileInDotpath(sessionName)
 	s := NewRpcServer(socket, config.C.AutoRun)
 
@@ -63,8 +63,7 @@ func Run(sessionName string) (returnStatus int) {
 	go s.serve()
 
 	// Print all logged information.
-	// TODO: minimum level is set via --flag.
-	if !log.Run(log.LevelDebug) {
+	if !log.Run(logLevel) {
 		returnStatus = 1
 	}
 
