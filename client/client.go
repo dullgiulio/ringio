@@ -145,7 +145,14 @@ func (cli *Cli) parseOptions(args []string) ([]string, []string) {
 			}
 		} else if args[i][0] == '-' {
 			// It's a command argument
-			nargs = append(nargs, args[i])
+			arg := args[i]
+
+			// Make --gnu-style args into -g-args
+			if args[i][1] == '-' {
+				arg = args[i][1:]
+			}
+
+			nargs = append(nargs, arg)
 		} else {
 			return nargs, args[i:]
 		}

@@ -54,7 +54,7 @@ func TestArgsParsing(t *testing.T) {
 func TestFilterArgs(t *testing.T) {
 	cli := NewCli()
 	nargs, args := cli.parseOptions([]string{
-		"-my-arg", "%1", "%-2", "-other-arg", "4", "-3", "-last-arg", "command", "-cmdarg"})
+		"-my-arg", "%1", "%-2", "--other-arg", "4", "-3", "-last-arg", "command", "-cmdarg"})
 
 	if cli.Filter.String() != "1,4,-2,-3" {
 		t.Error("Expected '1,4,-2,-3' as filter")
