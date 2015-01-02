@@ -2,8 +2,10 @@ package log
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 	"time"
 )
@@ -42,6 +44,30 @@ type Message struct {
 	facility Facility
 	level    Level
 	message  string
+}
+
+var prefixes map[Level]string = map[Level]string{
+	LevelDebug: "DEBUG",
+	LevelInfo:  "INFO",
+	LevelWarn:  "WARN",
+	LevelError: "ERROR",
+	LevelFail:  "FAIL",
+}
+
+func (l Level) String() string {
+	return prefixes[l]
+}
+
+func LevelFromString(s string) (Level, error) {
+	s = strings.ToUpper(s)
+
+	for l, sl := range prefixes {
+		if sl == s {
+			return l, nil
+		}
+	}
+
+	return LevelInfo, errors.New("Invalid value")
 }
 
 func init() {
@@ -94,14 +120,6 @@ func Cancel() {
 }
 
 func Run(minLevel Level) bool {
-	var prefixes map[Level]string = map[Level]string{
-		LevelDebug: "DEBUG",
-		LevelInfo:  "INFO",
-		LevelWarn:  "WARN",
-		LevelError: "ERROR",
-		LevelFail:  "FAIL",
-	}
-
 	for m := range _logger.c {
 		if m.level == LevelCancel {
 			return true
@@ -112,7 +130,7 @@ func Run(minLevel Level) bool {
 		}
 
 		t := time.Now().Format(time.RFC3339)
-		s := []byte(_string([]interface{}{t, prefixes[m.level] + ":", m.facility + ":", m.message}))
+		s := []byte(_string([]interface{}{t, m.level.String() + ":", m.facility + ":", m.message}))
 
 		_logger.lock.Lock()
 

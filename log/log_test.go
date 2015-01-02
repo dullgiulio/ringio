@@ -6,6 +6,20 @@ import (
 	"testing"
 )
 
+func TestLevel(t *testing.T) {
+	if LevelDebug.String() != "DEBUG" {
+		t.Error("Unexpected string value")
+	}
+
+	if l, e := LevelFromString("debug"); e != nil || l != LevelDebug {
+		t.Error("Unexpected value from string")
+	}
+
+	if _, e := LevelFromString("no-level"); e == nil {
+		t.Error("Expected error on invalid level string value")
+	}
+}
+
 func TestLogging(t *testing.T) {
 	var buf []byte
 
