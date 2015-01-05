@@ -23,6 +23,7 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 	}
 
 	if err := p.OpenWriteErr(); err != nil {
+		_removePipe(p)
 		utils.Fatal(err)
 	}
 
@@ -33,6 +34,7 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 			Type: agents.AgentTypePipe,
 		},
 	}, &id); err != nil {
+		_removePipe(p)
 		utils.Fatal(err)
 	}
 
