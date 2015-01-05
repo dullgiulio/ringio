@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/dullgiulio/ringio/agents"
+	"github.com/dullgiulio/ringio/onexit"
 	"github.com/dullgiulio/ringio/pipe"
 	"github.com/dullgiulio/ringio/server"
 	"github.com/dullgiulio/ringio/utils"
@@ -36,6 +37,12 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 	}
 
 	p.Remove()
+
+	onexit.Defer(func() {
+		if err := client.Call("RpcServer.Stop", id, &response); err != nil {
+			utils.Fatal(err)
+		}
+	})
 
 	// Write to pipe from stdin.
 	r := bufio.NewReader(os.Stdin)
