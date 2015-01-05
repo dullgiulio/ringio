@@ -29,6 +29,7 @@ const (
 	Start
 	Stop
 	Kill
+	Ping
 )
 
 type Client interface {
@@ -71,6 +72,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 		"start":  Start,
 		"stop":   Stop,
 		"kill":   Kill,
+		"ping":   Ping,
 	}
 
 	cli.argsLen = len(args) - 3
@@ -179,6 +181,8 @@ func (cli *Cli) getCommand() Client {
 		return NewCommandLog()
 	case Run:
 		return NewCommandRun()
+	case Ping:
+		return NewCommandPing()
 	case Open:
 		return NewCommandOpen()
 	case Close:

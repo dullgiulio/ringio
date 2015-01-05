@@ -72,6 +72,14 @@ func Run(logLevel log.Level, sessionName string) (returnStatus int) {
 	return
 }
 
+func (s *RpcServer) Ping(req *RpcReq, result *int) error {
+	*result = 1
+
+	// XXX: It would be nice to verify that the agents routine is actually running.
+
+	return nil
+}
+
 func (s *RpcServer) Add(req *RpcReq, result *int) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()

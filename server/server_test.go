@@ -21,12 +21,17 @@ func TestRpcServer(t *testing.T) {
 	s := NewRpcServer("test-socket", true)
 
 	resp := 0
+
 	req := &RpcReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{},
 			Meta: agents.AgentMetadata{Role: agents.AgentRoleSource},
 			Type: agents.AgentTypeNull,
 		},
+	}
+
+	if err := s.Ping(req, &resp); err != nil || resp != 1 {
+		t.Error(err)
 	}
 
 	if err := s.Add(req, &resp); err != nil {
