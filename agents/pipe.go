@@ -90,8 +90,6 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 		return
 	}
 
-	a.pipe.Remove()
-
 	id := a.meta.Id
 
 	cancelled := writeToRingbuf(id, a.pipe, rOutput, a.cancelCh, nil)

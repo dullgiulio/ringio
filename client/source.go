@@ -17,6 +17,10 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 
 	p := pipe.New(pipeName)
 
+	if err := p.Create(); err != nil {
+		utils.Fatal(err)
+	}
+
 	if err := p.OpenWriteErr(); err != nil {
 		utils.Fatal(err)
 	}
@@ -30,6 +34,8 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 	}, &id); err != nil {
 		utils.Fatal(err)
 	}
+
+	p.Remove()
 
 	// Write to pipe from stdin.
 	r := bufio.NewReader(os.Stdin)
