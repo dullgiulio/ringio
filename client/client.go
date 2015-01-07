@@ -75,18 +75,32 @@ func (cli *Cli) ParseArgs(args []string) error {
 		"ping":   Ping,
 	}
 
-	cli.argsLen = len(args) - 3
-	if cli.argsLen < 0 {
-		return nil
-	}
-
 	helpMode := false
 
 	cli.Session = args[1]
 
-	if cli.Session == "help" {
+	switch cli.Session {
+	case "help":
 		cli.Session = ""
 		helpMode = true
+	case "-ls":
+		sessions := getAllSessions()
+
+		if len(sessions) == 0 {
+			fmt.Printf("No sessions open. Please run 'ringio <session-name> open &' to start a session")
+			onexit.Exit(0)
+		}
+
+		fmt.Printf("Available open sessions:\n\n")
+		printList(sessions)
+
+		fmt.Printf("\nPlease use 'ringio <session-name> ping' to verify a session is active.\n")
+		onexit.Exit(1)
+	}
+
+	cli.argsLen = len(args) - 3
+	if cli.argsLen < 0 {
+		return nil
 	}
 
 	cli.CommandStr = args[2]

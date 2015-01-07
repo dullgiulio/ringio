@@ -19,7 +19,7 @@ func getBasepath(home string) string {
 	}
 }
 
-func getDotfileDir() string {
+func GetDotfileDir() string {
 	if _dotfileDir != "" {
 		return _dotfileDir
 	}
@@ -51,7 +51,7 @@ func GetRandomDotfile() string {
 }
 
 func FileInDotpath(filename string) string {
-	return path.Join(getDotfileDir(), path.Base(filename))
+	return path.Join(GetDotfileDir(), path.Base(filename))
 }
 
 func Fatal(err error) {

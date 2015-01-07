@@ -13,7 +13,7 @@ func TestDotdir(t *testing.T) {
 	tmphome := fmt.Sprintf("/tmp/%d", time.Now().Unix()/int64(time.Millisecond))
 	os.Setenv("HOME", tmphome)
 
-	dir := getDotfileDir()
+	dir := GetDotfileDir()
 	if !strings.HasPrefix(dir, tmphome) {
 		t.Error("Dot file was not created under the temporary home directory")
 	}

@@ -25,12 +25,6 @@ func addLogAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName stri
 	_addSinkAgentPipe(client, &agents.AgentMetadata{}, response, pipeName, agents.AgentRoleLog)
 }
 
-func _removePipe(p *pipe.Pipe) {
-	if err := p.Remove(); err != nil {
-		utils.Error(err)
-	}
-}
-
 func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 	response *server.RpcResp, pipeName string, role agents.AgentRole) {
 	var id int
