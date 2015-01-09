@@ -26,7 +26,10 @@ func TestAgentAdding(t *testing.T) {
 		proceed <- struct{}{}
 	}()
 
-	a0 := NewAgentNull(0, AgentRoleSource, nil, &AgentOptions{})
+	meta := NewAgentMetadata()
+    meta.Role = AgentRoleSource
+
+    a0 := NewAgentNull(0, meta)
 	resp := NewAgentMessageResponseBool()
 
 	ac.Add(a0, &resp)
@@ -34,7 +37,7 @@ func TestAgentAdding(t *testing.T) {
 		t.Error(err)
 	}
 
-	meta := a0.Meta()
+	meta = a0.Meta()
 
 	if meta.Id == 0 {
 		t.Error("Did not expect ID to be still zero after adding")
@@ -57,7 +60,10 @@ func TestAgentAdding(t *testing.T) {
 		t.Error("Expected finish time to be still undefined")
 	}
 
-	a1 := NewAgentNull(0, AgentRoleSource, nil, &AgentOptions{})
+    meta = NewAgentMetadata()
+    meta.Role = AgentRoleSource
+
+	a1 := NewAgentNull(0, meta)
 	resp = NewAgentMessageResponseBool()
 
 	ac.Add(a1, &resp)

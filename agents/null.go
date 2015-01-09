@@ -10,9 +10,9 @@ type AgentNull struct {
 	cancel chan bool
 }
 
-func NewAgentNull(id int, role AgentRole, filter *msg.Filter, options *AgentOptions) *AgentNull {
+func NewAgentNull(id int, meta *AgentMetadata) *AgentNull {
 	return &AgentNull{
-		meta:   &AgentMetadata{Id: id, Role: role, Filter: filter, Options: options},
+		meta:   meta,
 		cancel: make(chan bool),
 	}
 }

@@ -5,7 +5,9 @@ import (
 )
 
 func TestCmdIsAgent(t *testing.T) {
-	p := NewAgentCmd([]string{"test", "test"}, AgentRoleSource, nil, &AgentOptions{})
+    meta := NewAgentMetadata()
+    meta.Role = AgentRoleSource
+	p := NewAgentCmd([]string{"test", "test"}, meta)
 	if Agent(p) == nil {
 		t.Error("Cast failed")
 	}
