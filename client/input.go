@@ -3,7 +3,9 @@ package client
 import (
 	"flag"
 	"net/rpc"
+	"os"
 
+	"github.com/dullgiulio/ringio/agents"
 	"github.com/dullgiulio/ringio/server"
 	"github.com/dullgiulio/ringio/utils"
 )
@@ -11,6 +13,7 @@ import (
 type CommandInput struct {
 	client   *rpc.Client
 	response *server.RpcResp
+	name     string
 }
 
 func NewCommandInput() *CommandInput {
@@ -31,10 +34,15 @@ func (c *CommandInput) Init(fs *flag.FlagSet) bool {
 func (c *CommandInput) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
+	meta := agents.AgentMetadata{
+		User: os.Getenv("USER"),
+		Name: c.name,
+	}
+
 	if len(cli.Args) == 0 {
-		addSourceAgentPipe(c.client, c.response, utils.GetRandomDotfile())
+		addSourceAgentPipe(c.client, c.response, &meta, utils.GetRandomDotfile())
 	} else {
-		addSourceAgentCmd(c.client, c.response, cli.Args)
+		addSourceAgentCmd(c.client, c.response, &meta, cli.Args)
 	}
 	return nil
 }

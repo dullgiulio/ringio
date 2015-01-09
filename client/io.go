@@ -3,6 +3,7 @@ package client
 import (
 	"flag"
 	"net/rpc"
+	"os"
 
 	"github.com/dullgiulio/ringio/agents"
 	"github.com/dullgiulio/ringio/server"
@@ -12,6 +13,7 @@ import (
 type CommandIO struct {
 	client   *rpc.Client
 	response *server.RpcResp
+	name     string
 }
 
 func NewCommandIO() *CommandIO {
@@ -32,8 +34,15 @@ func (c *CommandIO) Init(fs *flag.FlagSet) bool {
 func (c *CommandIO) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	go addSourceAgentPipe(c.client, c.response, utils.GetRandomDotfile())
-	addSinkAgentPipe(c.client, &agents.AgentMetadata{Filter: cli.Filter}, c.response, utils.GetRandomDotfile())
+	metaSource := agents.AgentMetadata{
+		User: os.Getenv("USER"),
+		Name: c.name,
+	}
+	metaSink := metaSource
+	metaSink.Filter = cli.Filter
+
+	go addSourceAgentPipe(c.client, c.response, &metaSource, utils.GetRandomDotfile())
+	addSinkAgentPipe(c.client, &metaSink, c.response, utils.GetRandomDotfile())
 
 	return nil
 }

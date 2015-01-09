@@ -13,7 +13,7 @@ import (
 	"github.com/dullgiulio/ringio/utils"
 )
 
-func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName string) {
+func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, meta *agents.AgentMetadata, pipeName string) {
 	var id int
 
 	p := pipe.New(pipeName)
@@ -27,10 +27,12 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 		utils.Fatal(err)
 	}
 
+	meta.Role = agents.AgentRoleSource
+
 	if err := client.Call("RpcServer.Add", &server.RpcReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{pipeName},
-			Meta: agents.AgentMetadata{Role: agents.AgentRoleSource},
+			Meta: *meta,
 			Type: agents.AgentTypePipe,
 		},
 	}, &id); err != nil {
@@ -54,13 +56,15 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName s
 	}
 }
 
-func addSourceAgentCmd(client *rpc.Client, response *server.RpcResp, args []string) {
+func addSourceAgentCmd(client *rpc.Client, response *server.RpcResp, meta *agents.AgentMetadata, args []string) {
 	var id int
+
+	meta.Role = agents.AgentRoleSource
 
 	if err := client.Call("RpcServer.Add", &server.RpcReq{
 		Agent: &agents.AgentDescr{
 			Args: args,
-			Meta: agents.AgentMetadata{Role: agents.AgentRoleSource},
+			Meta: *meta,
 			Type: agents.AgentTypeCmd,
 		},
 	}, &id); err != nil {
