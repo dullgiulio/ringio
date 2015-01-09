@@ -27,8 +27,8 @@ func (c *CommandInput) Help() string {
 }
 
 func (c *CommandInput) Init(fs *flag.FlagSet) bool {
-	// nothing to do yet.
-	return false
+	fs.StringVar(&c.name, "name", "", "Name or comment of this source")
+	return true
 }
 
 func (c *CommandInput) Run(cli *Cli) error {

@@ -27,8 +27,8 @@ func (c *CommandIO) Help() string {
 }
 
 func (c *CommandIO) Init(fs *flag.FlagSet) bool {
-	// nothing to do yet.
-	return false
+	fs.StringVar(&c.name, "name", "", "Name or comment of this stream")
+	return true
 }
 
 func (c *CommandIO) Run(cli *Cli) error {

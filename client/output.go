@@ -28,6 +28,7 @@ func (c *CommandOutput) Help() string {
 
 func (c *CommandOutput) Init(fs *flag.FlagSet) bool {
 	fs.BoolVar(&c.meta.Options.NoWait, "no-wait", false, "Don't wait for future output, exit when finished dumping past data")
+	fs.StringVar(&c.meta.Name, "name", "", "Name or comment of this sink")
 	return true
 }
 
