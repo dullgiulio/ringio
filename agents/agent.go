@@ -15,6 +15,8 @@ type AgentMetadata struct {
 	Status   AgentStatus
 	Started  time.Time
 	Finished time.Time
+	User     string
+	Name     string
 	Filter   *msg.Filter
 	Options  *AgentOptions
 }

@@ -28,8 +28,14 @@ func (a *AgentDescr) String() string {
 		filter = fmt.Sprintf(" [%s]", a.Meta.Filter.String())
 	}
 
-	return fmt.Sprintf("%d %s %s%s %s",
-		a.Meta.Id, a.Meta.Status.String(), a.Meta.Role.String(), filter, args)
+	name := ""
+
+	if a.Meta.Name != "" {
+		name = " # " + a.Meta.Name
+	}
+
+	return fmt.Sprintf("%d %s %s%s %s%s",
+		a.Meta.Id, a.Meta.Status.String(), a.Meta.Role.String(), filter, args, name)
 }
 
 func (a *AgentDescr) Text() string {
@@ -40,6 +46,10 @@ func (a *AgentDescr) Text() string {
 
 	if a.Type == AgentTypeCmd {
 		descr = strings.Join(a.Args, " ")
+	}
+
+	if a.Meta.Name != "" {
+		descr += " # " + a.Meta.Name
 	}
 
 	fmt.Fprintf(&b, "%%%d %s agent\n", a.Meta.Id, a.Meta.Role.Text())
@@ -56,6 +66,10 @@ func (a *AgentDescr) Text() string {
 		fmt.Fprintf(&b, "finished: %s\n", a.Meta.Finished.Format(dateFormat))
 	} else {
 		fmt.Fprintf(&b, "finished: not finished\n")
+	}
+
+	if a.Meta.User != "" {
+		fmt.Fprintf(&b, "user: %s\n", a.Meta.User)
 	}
 
 	return b.String()
