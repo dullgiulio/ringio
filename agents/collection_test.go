@@ -27,9 +27,9 @@ func TestAgentAdding(t *testing.T) {
 	}()
 
 	meta := NewAgentMetadata()
-    meta.Role = AgentRoleSource
+	meta.Role = AgentRoleSource
 
-    a0 := NewAgentNull(0, meta)
+	a0 := NewAgentNull(0, meta)
 	resp := NewAgentMessageResponseBool()
 
 	ac.Add(a0, &resp)
@@ -60,8 +60,8 @@ func TestAgentAdding(t *testing.T) {
 		t.Error("Expected finish time to be still undefined")
 	}
 
-    meta = NewAgentMetadata()
-    meta.Role = AgentRoleSource
+	meta = NewAgentMetadata()
+	meta.Role = AgentRoleSource
 
 	a1 := NewAgentNull(0, meta)
 	resp = NewAgentMessageResponseBool()

@@ -6,8 +6,8 @@ import (
 
 func TestPipeIsAgent(t *testing.T) {
 	meta := NewAgentMetadata()
-    meta.Role = AgentRoleSource
-    p := NewAgentPipe("test", meta)
+	meta.Role = AgentRoleSource
+	p := NewAgentPipe("test", meta)
 	if Agent(p) == nil {
 		t.Error("Cast failed")
 	}
