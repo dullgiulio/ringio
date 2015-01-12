@@ -10,12 +10,12 @@ import (
 
 type CommandRun struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 }
 
 func NewCommandRun() *CommandRun {
 	return &CommandRun{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 
@@ -31,7 +31,7 @@ func (c *CommandRun) Init(fs *flag.FlagSet) bool {
 func (c *CommandRun) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	if err := c.client.Call("RpcServer.Run", &server.RpcReq{}, &c.response); err != nil {
+	if err := c.client.Call("RpcServer.Run", &server.RPCReq{}, &c.response); err != nil {
 		utils.Fatal(err)
 	}
 

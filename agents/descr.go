@@ -35,7 +35,7 @@ func (a *AgentDescr) String() string {
 	}
 
 	return fmt.Sprintf("%d %s %s%s %s%s",
-		a.Meta.Id, a.Meta.Status.String(), a.Meta.Role.String(), filter, args, name)
+		a.Meta.ID, a.Meta.Status.String(), a.Meta.Role.String(), filter, args, name)
 }
 
 func (a *AgentDescr) Text() string {
@@ -52,7 +52,7 @@ func (a *AgentDescr) Text() string {
 		descr += " # " + a.Meta.Name
 	}
 
-	fmt.Fprintf(&b, "%%%d %s agent\n", a.Meta.Id, a.Meta.Role.Text())
+	fmt.Fprintf(&b, "%%%d %s agent\n", a.Meta.ID, a.Meta.Role.Text())
 	fmt.Fprintf(&b, "status: %s\n", a.Meta.Status.Text())
 	fmt.Fprintf(&b, "descr: %s\n", descr)
 

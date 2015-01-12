@@ -39,10 +39,10 @@ func TestAgentAdding(t *testing.T) {
 
 	meta = a0.Meta()
 
-	if meta.Id == 0 {
+	if meta.ID == 0 {
 		t.Error("Did not expect ID to be still zero after adding")
 	}
-	firstId := meta.Id
+	firstID := meta.ID
 
 	if meta.Role != AgentRoleSource {
 		t.Error("Adding an agent changed its role")
@@ -74,11 +74,11 @@ func TestAgentAdding(t *testing.T) {
 
 	meta = a1.Meta()
 
-	if meta.Id == 0 {
+	if meta.ID == 0 {
 		t.Error("Did not expect ID to be still zero after adding")
 	}
 
-	if meta.Id <= firstId {
+	if meta.ID <= firstID {
 		t.Error("Expected second ID to be greater than the first")
 	}
 
@@ -107,7 +107,7 @@ func TestAgentAdding(t *testing.T) {
 	<-proceed
 
 	meta = a0.Meta()
-	if meta.Id == 0 {
+	if meta.ID == 0 {
 		t.Error("Did not expect ID to be still zero after cancel")
 	}
 
@@ -128,7 +128,7 @@ func TestAgentAdding(t *testing.T) {
 	}
 
 	meta = a1.Meta()
-	if meta.Id == 0 {
+	if meta.ID == 0 {
 		t.Error("Did not expect ID to be still zero after cancel")
 	}
 

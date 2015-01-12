@@ -22,8 +22,8 @@ func TestFromString(t *testing.T) {
 		t.Error(err)
 	}
 
-	if m.senderId != 12 {
-		t.Error("Expected senderId to be set correctly")
+	if m.senderID != 12 {
+		t.Error("Expected senderID to be set correctly")
 	}
 
 	if m.time != 1416213479589 {
@@ -60,7 +60,7 @@ func TestCasting(t *testing.T) {
 	m = Msg(2, []byte(str))
 	mc := Cast(m)
 
-	if string(mc.Data()) != str || mc.senderId != 2 {
+	if string(mc.Data()) != str || mc.senderID != 2 {
 		t.Error("Casting did not preserve a Message")
 	}
 }

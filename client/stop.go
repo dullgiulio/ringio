@@ -11,12 +11,12 @@ import (
 
 type CommandStop struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 }
 
 func NewCommandStop() *CommandStop {
 	return &CommandStop{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 

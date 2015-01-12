@@ -12,13 +12,13 @@ import (
 
 type CommandIO struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 	name     string
 }
 
 func NewCommandIO() *CommandIO {
 	return &CommandIO{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 

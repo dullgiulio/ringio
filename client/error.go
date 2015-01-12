@@ -11,12 +11,12 @@ import (
 
 type CommandError struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 }
 
 func NewCommandError() *CommandError {
 	return &CommandError{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 

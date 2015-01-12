@@ -23,7 +23,7 @@ func getAllSessions() []string {
 		utils.Error(err)
 	}
 
-	sockets := make([]string, 0)
+	var sockets []string
 
 	for _, finfo := range files {
 		mode := finfo.Mode()

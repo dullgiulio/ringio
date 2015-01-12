@@ -10,7 +10,7 @@ import (
 )
 
 type AgentMetadata struct {
-	Id       int
+	ID       int
 	Role     AgentRole
 	Status   AgentStatus
 	Started  time.Time
@@ -64,7 +64,7 @@ func (ac *Collection) isFilteringSinkAgents(filter *msg.Filter) bool {
 
 		if meta.Role == AgentRoleSink {
 			for _, id := range fin {
-				if meta.Id == id {
+				if meta.ID == id {
 					return true
 				}
 			}
@@ -88,17 +88,17 @@ func (ac *Collection) validateFilter(self int, filter *msg.Filter) error {
 	fin := filter.GetIn()
 	fout := filter.GetOut()
 
-	agentIds := make(map[int]struct{})
+	agentIDs := make(map[int]struct{})
 
 	for i := 0; i < len(ac.agents); i++ {
 		a := ac.agents[i]
 		meta := a.Meta()
 
-		agentIds[meta.Id] = struct{}{}
+		agentIDs[meta.ID] = struct{}{}
 	}
 
 	for _, id := range fin {
-		if _, ok := agentIds[id]; !ok {
+		if _, ok := agentIDs[id]; !ok {
 			return fmt.Errorf("%%%d is not a valid agent", id)
 		}
 
@@ -108,7 +108,7 @@ func (ac *Collection) validateFilter(self int, filter *msg.Filter) error {
 	}
 
 	for _, id := range fout {
-		if _, ok := agentIds[id]; !ok {
+		if _, ok := agentIDs[id]; !ok {
 			return fmt.Errorf("%%%d is not a valid agent", id)
 		}
 
@@ -161,7 +161,7 @@ func (ac *Collection) runAgent(a Agent) error {
 
 	// Notice that this validation doesn't make safe access to ac:
 	// it is safe to call it here, but not an a go routine.
-	if err := ac.validateFilter(meta.Id, meta.Filter); err != nil {
+	if err := ac.validateFilter(meta.ID, meta.Filter); err != nil {
 		return err
 	}
 

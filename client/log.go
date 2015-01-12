@@ -10,12 +10,12 @@ import (
 
 type CommandLog struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 }
 
 func NewCommandLog() *CommandLog {
 	return &CommandLog{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 

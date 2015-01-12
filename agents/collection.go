@@ -88,23 +88,23 @@ func (c *Collection) List(response AgentMessageResponse) {
 }
 
 func (c *Collection) add(newAgent Agent) int {
-	maxId := 0
+	maxID := 0
 
 	for _, a := range c.agents {
 		meta := a.Meta()
 
-		if id := meta.Id; id > maxId {
-			maxId = id
+		if id := meta.ID; id > maxID {
+			maxID = id
 		}
 	}
 
-	maxId++
+	maxID++
 
 	meta := newAgent.Meta()
-	meta.Id = maxId
+	meta.ID = maxID
 
 	c.agents = append(c.agents, newAgent)
-	return maxId
+	return maxID
 }
 
 // Implement a sort.Interface that sorts by (role,started date) and prints.
@@ -122,7 +122,7 @@ func (c *Collection) Less(i, j int) bool {
 	}
 
 	if metaI.Status == metaJ.Status &&
-		metaI.Id < metaJ.Id {
+		metaI.ID < metaJ.ID {
 		return true
 	}
 
@@ -139,7 +139,7 @@ func (c *Collection) getRealAgent(agent Agent) Agent {
 	meta := agent.Meta()
 
 	for _, a := range c.agents {
-		if a == agent || a.Meta().Id == meta.Id {
+		if a == agent || a.Meta().ID == meta.ID {
 			realAgent = a
 			break
 		}
@@ -151,7 +151,7 @@ func (c *Collection) getRealAgent(agent Agent) Agent {
 func (c *Collection) waitFinish(agent Agent) {
 	if err := agent.WaitFinish(); err != nil {
 		// Something went wrong, this agent is not finished.
-		log.Error(log.FacilityAgent, fmt.Sprintf("Error waiting for %d: %s", agent.Meta().Id, err))
+		log.Error(log.FacilityAgent, fmt.Sprintf("Error waiting for %d: %s", agent.Meta().ID, err))
 	}
 
 	// We signal back to the collection that this agents is finished.
@@ -159,7 +159,7 @@ func (c *Collection) waitFinish(agent Agent) {
 	c.Finished(agent, &resp)
 
 	if _, err := resp.Get(); err != nil {
-		log.Error(log.FacilityAgent, fmt.Sprintf("Error cleaning up %d: %s", agent.Meta().Id, err))
+		log.Error(log.FacilityAgent, fmt.Sprintf("Error cleaning up %d: %s", agent.Meta().ID, err))
 	}
 }
 
@@ -167,7 +167,7 @@ func (c *Collection) stopOrKillAgent(msg agentMessage, kill bool) {
 	realAgent := c.getRealAgent(msg.agent)
 
 	if realAgent == nil {
-		msg.response.Err(fmt.Errorf("Agent %d not found", msg.agent.Meta().Id))
+		msg.response.Err(fmt.Errorf("Agent %d not found", msg.agent.Meta().ID))
 		return
 	}
 
@@ -177,7 +177,7 @@ func (c *Collection) stopOrKillAgent(msg agentMessage, kill bool) {
 	if !kill {
 		// Cannot stop an Agent that is not in running state.
 		if !isRunning {
-			msg.response.Err(fmt.Errorf("Agent %d is not marked as running", meta.Id))
+			msg.response.Err(fmt.Errorf("Agent %d is not marked as running", meta.ID))
 			return
 		}
 
@@ -213,7 +213,7 @@ func (c *Collection) startAgent(agent Agent) error {
 
 	switch meta.Status {
 	case AgentStatusKilled, AgentStatusStopped, AgentStatusRunning:
-		return fmt.Errorf("Agent %d is already running", meta.Id)
+		return fmt.Errorf("Agent %d is already running", meta.ID)
 	}
 
 	agent.Init()
@@ -222,7 +222,7 @@ func (c *Collection) startAgent(agent Agent) error {
 		return err
 	}
 
-	log.Info(log.FacilityAgent, fmt.Sprintf("Started agent %d", meta.Id))
+	log.Info(log.FacilityAgent, fmt.Sprintf("Started agent %d", meta.ID))
 	return nil
 }
 
@@ -248,7 +248,7 @@ func (c *Collection) Run(autorun bool) {
 			realAgent := c.getRealAgent(msg.agent)
 
 			if realAgent == nil {
-				err := fmt.Errorf("Agent %d not found", msg.agent.Meta().Id)
+				err := fmt.Errorf("Agent %d not found", msg.agent.Meta().ID)
 				log.Error(log.FacilityAgent, err)
 				msg.response.Err(err)
 				continue

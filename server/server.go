@@ -15,7 +15,7 @@ import (
 	"github.com/dullgiulio/ringio/utils"
 )
 
-type RpcServer struct {
+type RPCServer struct {
 	ac     *agents.Collection
 	resp   agents.AgentMessageResponseBool
 	socket string
@@ -23,9 +23,9 @@ type RpcServer struct {
 	mux    *sync.Mutex
 }
 
-func NewRpcServer(socket string, autorun bool) *RpcServer {
+func NewRPCServer(socket string, autorun bool) *RPCServer {
 	ac := agents.NewCollection()
-	s := &RpcServer{
+	s := &RPCServer{
 		socket: socket,
 		ac:     ac,
 		resp:   agents.NewAgentMessageResponseBool(),
@@ -37,13 +37,13 @@ func NewRpcServer(socket string, autorun bool) *RpcServer {
 	return s
 }
 
-type RpcReq struct {
+type RPCReq struct {
 	Agent *agents.AgentDescr
 }
 
-type RpcResp bool
+type RPCResp bool
 
-var sessionOver error = errors.New("Session has already terminated")
+var errSessionOver = errors.New("Session has already terminated")
 
 func Init() {
 	if config.C.PrintLog {
@@ -57,7 +57,7 @@ func Init() {
 
 func Run(logLevel log.Level, sessionName string) (returnStatus int) {
 	socket := utils.FileInDotpath(sessionName)
-	s := NewRpcServer(socket, config.C.AutoRun)
+	s := NewRPCServer(socket, config.C.AutoRun)
 
 	// Serve RPC calls.
 	go s.serve()
@@ -72,7 +72,7 @@ func Run(logLevel log.Level, sessionName string) (returnStatus int) {
 	return
 }
 
-func (s *RpcServer) Ping(req *RpcReq, result *int) error {
+func (s *RPCServer) Ping(req *RPCReq, result *int) error {
 	*result = 1
 
 	// XXX: It would be nice to verify that the agents routine is actually running.
@@ -80,14 +80,14 @@ func (s *RpcServer) Ping(req *RpcReq, result *int) error {
 	return nil
 }
 
-func (s *RpcServer) Add(req *RpcReq, result *int) error {
+func (s *RPCServer) Add(req *RPCReq, result *int) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	var agent agents.Agent
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	ag := req.Agent
@@ -122,12 +122,12 @@ func (s *RpcServer) Add(req *RpcReq, result *int) error {
 	return nil
 }
 
-func (s *RpcServer) List(req *RpcReq, result *agents.AgentMessageResponseList) error {
+func (s *RPCServer) List(req *RPCReq, result *agents.AgentMessageResponseList) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	*result = agents.NewAgentMessageResponseList()
@@ -138,12 +138,12 @@ func (s *RpcServer) List(req *RpcReq, result *agents.AgentMessageResponseList) e
 	return result.Error
 }
 
-func (s *RpcServer) Run(req *RpcReq, result *RpcResp) error {
+func (s *RPCServer) Run(req *RPCReq, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	*result = true
@@ -154,12 +154,12 @@ func (s *RpcServer) Run(req *RpcReq, result *RpcResp) error {
 	return nil
 }
 
-func (s *RpcServer) StartAll(req *RpcReq, result *RpcResp) error {
+func (s *RPCServer) StartAll(req *RPCReq, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	s.ac.StartAll(&s.resp)
@@ -169,12 +169,12 @@ func (s *RpcServer) StartAll(req *RpcReq, result *RpcResp) error {
 	return nil
 }
 
-func (s *RpcServer) Start(id int, result *RpcResp) error {
+func (s *RPCServer) Start(id int, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	na := agents.NewAgentNull(id, agents.NewAgentMetadata()) // Role is unimportant here.
@@ -185,12 +185,12 @@ func (s *RpcServer) Start(id int, result *RpcResp) error {
 	return nil
 }
 
-func (s *RpcServer) Stop(id int, result *RpcResp) error {
+func (s *RPCServer) Stop(id int, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	na := agents.NewAgentNull(id, agents.NewAgentMetadata()) // Role is unimportant here.
@@ -201,12 +201,12 @@ func (s *RpcServer) Stop(id int, result *RpcResp) error {
 	return nil
 }
 
-func (s *RpcServer) Kill(id int, result *RpcResp) error {
+func (s *RPCServer) Kill(id int, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	na := agents.NewAgentNull(id, agents.NewAgentMetadata()) // Role is unimportant here.
@@ -217,12 +217,12 @@ func (s *RpcServer) Kill(id int, result *RpcResp) error {
 	return nil
 }
 
-func (s *RpcServer) Close(req *RpcReq, result *RpcResp) error {
+func (s *RPCServer) Close(req *RPCReq, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	if s.over {
-		return sessionOver
+		return errSessionOver
 	}
 
 	// This session has terminated.
@@ -240,7 +240,7 @@ func (s *RpcServer) Close(req *RpcReq, result *RpcResp) error {
 	return nil
 }
 
-func (s *RpcServer) cleanup() {
+func (s *RPCServer) cleanup() {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -249,7 +249,7 @@ func (s *RpcServer) cleanup() {
 	os.Remove(s.socket)
 }
 
-func (s *RpcServer) serve() {
+func (s *RPCServer) serve() {
 	l, err := net.Listen("unix", s.socket)
 	if err != nil {
 		utils.Fatal(err)

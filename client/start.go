@@ -11,13 +11,13 @@ import (
 
 type CommandStart struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 	startAll bool
 }
 
 func NewCommandStart() *CommandStart {
 	return &CommandStart{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 
@@ -55,7 +55,7 @@ func (c *CommandStart) all(cli *Cli) {
 		utils.Fatal(errors.New("Filtering when --all is specified makes no sense."))
 	}
 
-	if err := c.client.Call("RpcServer.StartAll", &server.RpcReq{}, &c.response); err != nil {
+	if err := c.client.Call("RpcServer.StartAll", &server.RPCReq{}, &c.response); err != nil {
 		utils.Fatal(err)
 	}
 }

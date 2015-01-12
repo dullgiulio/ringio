@@ -13,20 +13,20 @@ import (
 	"github.com/dullgiulio/ringio/utils"
 )
 
-func addErrorsAgentPipe(client *rpc.Client, meta *agents.AgentMetadata, response *server.RpcResp, pipeName string) {
+func addErrorsAgentPipe(client *rpc.Client, meta *agents.AgentMetadata, response *server.RPCResp, pipeName string) {
 	_addSinkAgentPipe(client, meta, response, pipeName, agents.AgentRoleErrors)
 }
 
-func addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata, response *server.RpcResp, pipeName string) {
+func addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata, response *server.RPCResp, pipeName string) {
 	_addSinkAgentPipe(client, meta, response, pipeName, agents.AgentRoleSink)
 }
 
-func addLogAgentPipe(client *rpc.Client, response *server.RpcResp, pipeName string) {
+func addLogAgentPipe(client *rpc.Client, response *server.RPCResp, pipeName string) {
 	_addSinkAgentPipe(client, &agents.AgentMetadata{}, response, pipeName, agents.AgentRoleLog)
 }
 
 func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
-	response *server.RpcResp, pipeName string, role agents.AgentRole) {
+	response *server.RPCResp, pipeName string, role agents.AgentRole) {
 	var id int
 
 	p := pipe.New(pipeName)
@@ -56,7 +56,7 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 		done <- struct{}{}
 	}(done)
 
-	if err := client.Call("RpcServer.Add", &server.RpcReq{
+	if err := client.Call("RpcServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{pipeName},
 			Meta: *meta,
@@ -82,21 +82,21 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 	}
 }
 
-func addErrorsAgentCmd(client *rpc.Client, meta *agents.AgentMetadata, response *server.RpcResp, args []string) {
+func addErrorsAgentCmd(client *rpc.Client, meta *agents.AgentMetadata, response *server.RPCResp, args []string) {
 	_addSinkAgentCmd(client, meta, response, args, agents.AgentRoleErrors)
 }
 
-func addSinkAgentCmd(client *rpc.Client, meta *agents.AgentMetadata, response *server.RpcResp, args []string) {
+func addSinkAgentCmd(client *rpc.Client, meta *agents.AgentMetadata, response *server.RPCResp, args []string) {
 	_addSinkAgentCmd(client, meta, response, args, agents.AgentRoleSink)
 }
 
 func _addSinkAgentCmd(client *rpc.Client, meta *agents.AgentMetadata,
-	response *server.RpcResp, args []string, role agents.AgentRole) {
+	response *server.RPCResp, args []string, role agents.AgentRole) {
 	var id int
 
 	meta.Role = role
 
-	if err := client.Call("RpcServer.Add", &server.RpcReq{
+	if err := client.Call("RpcServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: args,
 			Meta: *meta,

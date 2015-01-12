@@ -1,7 +1,6 @@
 package client
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"net/rpc"
@@ -55,7 +54,7 @@ func NewCli() *Cli {
 }
 
 func (cli *Cli) ParseArgs(args []string) error {
-	var cmdCommand map[string]Command = map[string]Command{
+	cmdCommand := map[string]Command{
 		"input":  Input,
 		"in":     Input,
 		"output": Output,
@@ -111,7 +110,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 	cli.client = cli.getCommand()
 
 	if cli.client == nil {
-		return errors.New(fmt.Sprintf("Unsupported command %s", cli.CommandStr))
+		return fmt.Errorf("Unsupported command %s", cli.CommandStr)
 	}
 
 	haveArgs := cli.client.Init(cli.flagset)
@@ -140,7 +139,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 
 // XXX: "-option arg" is not accepted, but only "-option=arg".
 func (cli *Cli) parseOptions(args []string) ([]string, []string) {
-	nargs := make([]string, 0)
+	var nargs []string
 
 	for i := range args {
 		arg := args[i]

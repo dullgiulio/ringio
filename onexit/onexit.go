@@ -5,12 +5,12 @@ import (
 	"os/signal"
 )
 
-type OnExitFunc func()
+type Func func()
 
 type onExit struct {
 	i  int
 	s  chan os.Signal
-	fs []OnExitFunc
+	fs []Func
 	e  func(int)
 }
 
@@ -19,16 +19,16 @@ var _onExit onExit
 func init() {
 	_onExit = onExit{
 		s:  make(chan os.Signal),
-		fs: make([]OnExitFunc, 0),
+		fs: make([]Func, 0),
 		e:  os.Exit,
 	}
 }
 
-func SetExitFunc(e func(int)) {
+func SetFunc(e func(int)) {
 	_onExit.e = e
 }
 
-func Defer(f OnExitFunc) {
+func Defer(f Func) {
 	_onExit.fs = append(_onExit.fs, f)
 }
 

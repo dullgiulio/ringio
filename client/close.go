@@ -10,12 +10,12 @@ import (
 
 type CommandClose struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 }
 
 func NewCommandClose() *CommandClose {
 	return &CommandClose{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 
@@ -31,7 +31,7 @@ func (c *CommandClose) Init(fs *flag.FlagSet) bool {
 func (c *CommandClose) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	if err := c.client.Call("RpcServer.Close", &server.RpcReq{}, &c.response); err != nil {
+	if err := c.client.Call("RpcServer.Close", &server.RPCReq{}, &c.response); err != nil {
 		utils.Fatal(err)
 	}
 

@@ -68,7 +68,7 @@ func (a *AgentPipe) Stop() error {
 		return err
 	}
 
-	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been stopped", a.meta.Id))
+	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been stopped", a.meta.ID))
 	return nil
 }
 
@@ -77,7 +77,7 @@ func (a *AgentPipe) Kill() error {
 		return err
 	}
 
-	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been killed", a.meta.Id))
+	log.Info(log.FacilityAgent, fmt.Sprintf("PipeAgent %d has been killed", a.meta.ID))
 	return nil
 }
 
@@ -90,7 +90,7 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 		return
 	}
 
-	id := a.meta.Id
+	id := a.meta.ID
 
 	cancelled := writeToRingbuf(id, a.pipe, rOutput, a.cancelCh, nil)
 

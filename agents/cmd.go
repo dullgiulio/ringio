@@ -70,7 +70,7 @@ func (a *AgentCmd) Stop() error {
 
 	// Subprocess should exit normally now, a successive Wait() will finish it.
 
-	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been stopped", a.meta.Id))
+	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been stopped", a.meta.ID))
 	return nil
 }
 
@@ -96,7 +96,7 @@ func (a *AgentCmd) Kill() error {
 		return err
 	}
 
-	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been killed", a.meta.Id))
+	log.Info(log.FacilityAgent, fmt.Sprintf("CmdAgent %d has been killed", a.meta.ID))
 	return nil
 }
 
@@ -124,7 +124,7 @@ func (a *AgentCmd) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 		return
 	}
 
-	id := a.meta.Id
+	id := a.meta.ID
 
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
@@ -169,7 +169,7 @@ func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf,
 		return
 	}
 
-	id := a.meta.Id
+	id := a.meta.ID
 
 	wg := new(sync.WaitGroup)
 	wg.Add(3)

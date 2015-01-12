@@ -13,7 +13,7 @@ import (
 	"github.com/dullgiulio/ringio/utils"
 )
 
-func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, meta *agents.AgentMetadata, pipeName string) {
+func addSourceAgentPipe(client *rpc.Client, response *server.RPCResp, meta *agents.AgentMetadata, pipeName string) {
 	var id int
 
 	p := pipe.New(pipeName)
@@ -29,7 +29,7 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, meta *agen
 
 	meta.Role = agents.AgentRoleSource
 
-	if err := client.Call("RpcServer.Add", &server.RpcReq{
+	if err := client.Call("RpcServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{pipeName},
 			Meta: *meta,
@@ -56,12 +56,12 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RpcResp, meta *agen
 	}
 }
 
-func addSourceAgentCmd(client *rpc.Client, response *server.RpcResp, meta *agents.AgentMetadata, args []string) {
+func addSourceAgentCmd(client *rpc.Client, response *server.RPCResp, meta *agents.AgentMetadata, args []string) {
 	var id int
 
 	meta.Role = agents.AgentRoleSource
 
-	if err := client.Call("RpcServer.Add", &server.RpcReq{
+	if err := client.Call("RpcServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: args,
 			Meta: *meta,

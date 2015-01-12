@@ -16,7 +16,7 @@ type _Config struct {
 
 var C *_Config
 
-var defaults _Config = _Config{
+var defaults = _Config{
 	RingbufSize:    1024,
 	RingbufLogSize: 1024,
 	MaxLineSize:    1024,

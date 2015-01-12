@@ -46,7 +46,7 @@ type Message struct {
 	message  string
 }
 
-var prefixes map[Level]string = map[Level]string{
+var prefixes = map[Level]string{
 	LevelDebug: "DEBUG",
 	LevelInfo:  "INFO",
 	LevelWarn:  "WARN",

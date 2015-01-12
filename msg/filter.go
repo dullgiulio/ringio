@@ -81,7 +81,7 @@ func (m *Message) Allowed(f *Filter) bool {
 		return true
 	}
 
-	id := m.senderId
+	id := m.senderID
 
 	if len(f.Excluded) > 0 {
 		for _, out := range f.Excluded {

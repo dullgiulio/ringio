@@ -6,7 +6,7 @@ import (
 )
 
 type Message struct {
-	senderId int
+	senderID int
 	time     int64
 	data     []byte
 }
@@ -15,12 +15,12 @@ func makeTimestamp() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
-func Msg(senderId int, data []byte) Message {
-	return Message{senderId, makeTimestamp(), data}
+func Msg(senderID int, data []byte) Message {
+	return Message{senderID, makeTimestamp(), data}
 }
 
 func (m Message) String() string {
-	return fmt.Sprintf("%d %d %s", m.senderId, m.time, m.data)
+	return fmt.Sprintf("%d %d %s", m.senderID, m.time, m.data)
 }
 
 func (m Message) Data() []byte {
@@ -46,7 +46,7 @@ func FromString(msg []byte) (Message, error) {
 	}
 
 	if metastr != "" {
-		if _, err := fmt.Sscanf(metastr, "%d %d", &m.senderId, &m.time); err != nil {
+		if _, err := fmt.Sscanf(metastr, "%d %d", &m.senderID, &m.time); err != nil {
 			return m, err
 		}
 	}

@@ -50,10 +50,10 @@ func (p *Pipe) OpenWriteErr() error {
 	file, err := os.OpenFile(p.filename, os.O_RDWR|os.O_APPEND, 0600)
 	if err != nil {
 		return fmt.Errorf("Opening pipe for writing failed: %s", err)
-	} else {
-		p.isOpen = true
-		p.file = file
 	}
+
+	p.isOpen = true
+	p.file = file
 
 	return nil
 }
@@ -73,12 +73,13 @@ func (p *Pipe) OpenRead() bool {
 }
 
 func (p *Pipe) OpenReadErr() error {
-	if file, err := os.Open(p.filename); err != nil {
+	file, err := os.Open(p.filename)
+	if err != nil {
 		return fmt.Errorf("Opening pipe for reading failed: %s", err)
-	} else {
-		p.isOpen = true
-		p.file = file
 	}
+
+	p.isOpen = true
+	p.file = file
 
 	return nil
 }

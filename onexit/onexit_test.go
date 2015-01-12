@@ -7,7 +7,7 @@ import (
 func TestExit(t *testing.T) {
 	exitVal := 0
 
-	SetExitFunc(func(i int) {
+	SetFunc(func(i int) {
 		exitVal = i
 	})
 
@@ -21,7 +21,7 @@ func TestExit(t *testing.T) {
 func TestDefer(t *testing.T) {
 	exitVal := 0
 
-	SetExitFunc(func(i int) {
+	SetFunc(func(i int) {
 		exitVal += i
 	})
 
@@ -39,7 +39,7 @@ func TestPendingExit(t *testing.T) {
 	exitVal := 0
 	done := make(chan struct{})
 
-	SetExitFunc(func(i int) {
+	SetFunc(func(i int) {
 		exitVal = i
 		done <- struct{}{}
 	})

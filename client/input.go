@@ -12,13 +12,13 @@ import (
 
 type CommandInput struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 	name     string
 }
 
 func NewCommandInput() *CommandInput {
 	return &CommandInput{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 

@@ -11,12 +11,12 @@ import (
 
 type CommandKill struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 }
 
 func NewCommandKill() *CommandKill {
 	return &CommandKill{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 	}
 }
 

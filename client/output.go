@@ -11,13 +11,13 @@ import (
 
 type CommandOutput struct {
 	client   *rpc.Client
-	response *server.RpcResp
+	response *server.RPCResp
 	meta     *agents.AgentMetadata
 }
 
 func NewCommandOutput() *CommandOutput {
 	return &CommandOutput{
-		response: new(server.RpcResp),
+		response: new(server.RPCResp),
 		meta:     agents.NewAgentMetadata(),
 	}
 }

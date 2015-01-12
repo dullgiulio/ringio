@@ -8,7 +8,7 @@ import (
 	"github.com/dullgiulio/ringio/onexit"
 )
 
-func TestRpcServer(t *testing.T) {
+func TestRPCServer(t *testing.T) {
 	proceed := make(chan struct{})
 
 	go func() {
@@ -18,11 +18,11 @@ func TestRpcServer(t *testing.T) {
 		proceed <- struct{}{}
 	}()
 
-	s := NewRpcServer("test-socket", true)
+	s := NewRPCServer("test-socket", true)
 
 	resp := 0
 
-	req := &RpcReq{
+	req := &RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{},
 			Meta: agents.AgentMetadata{Role: agents.AgentRoleSource},
@@ -42,7 +42,7 @@ func TestRpcServer(t *testing.T) {
 		t.Error("Expected an ID as response")
 	}
 
-	var done RpcResp
+	var done RPCResp
 
 	if err := s.Kill(resp, &done); err != nil {
 		t.Error(err)
@@ -79,7 +79,7 @@ func TestRpcServer(t *testing.T) {
 
 	exit := make(chan int)
 
-	onexit.SetExitFunc(func(i int) {
+	onexit.SetFunc(func(i int) {
 		exit <- i
 	})
 	onexit.HandleInterrupt()

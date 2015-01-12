@@ -14,9 +14,9 @@ var _letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234
 func getBasepath(home string) string {
 	if home == "" {
 		return path.Join(os.TempDir(), ".ringio-"+os.Getenv("USER"))
-	} else {
-		return path.Join(home, ".ringio")
 	}
+
+	return path.Join(home, ".ringio")
 }
 
 func GetDotfileDir() string {
