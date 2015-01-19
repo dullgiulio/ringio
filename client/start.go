@@ -44,7 +44,7 @@ func (c *CommandStart) agent(cli *Cli) {
 	}
 
 	for _, id := range in {
-		if err := c.client.Call("RpcServer.Start", id, &c.response); err != nil {
+		if err := c.client.Call("RPCServer.Start", id, &c.response); err != nil {
 			utils.Error(err)
 		}
 	}
@@ -55,7 +55,7 @@ func (c *CommandStart) all(cli *Cli) {
 		utils.Fatal(errors.New("Filtering when --all is specified makes no sense."))
 	}
 
-	if err := c.client.Call("RpcServer.StartAll", &server.RPCReq{}, &c.response); err != nil {
+	if err := c.client.Call("RPCServer.StartAll", &server.RPCReq{}, &c.response); err != nil {
 		utils.Fatal(err)
 	}
 }

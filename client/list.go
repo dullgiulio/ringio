@@ -33,7 +33,7 @@ func (c *CommandList) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
 	responseList := agents.NewAgentMessageResponseList()
-	if err := c.client.Call("RpcServer.List", &server.RPCReq{}, &responseList); err != nil {
+	if err := c.client.Call("RPCServer.List", &server.RPCReq{}, &responseList); err != nil {
 		utils.Fatal(err)
 	} else {
 		if responseList.Agents != nil {

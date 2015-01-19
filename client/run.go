@@ -31,7 +31,7 @@ func (c *CommandRun) Init(fs *flag.FlagSet) bool {
 func (c *CommandRun) Run(cli *Cli) error {
 	c.client = cli.GetClient()
 
-	if err := c.client.Call("RpcServer.Run", &server.RPCReq{}, &c.response); err != nil {
+	if err := c.client.Call("RPCServer.Run", &server.RPCReq{}, &c.response); err != nil {
 		utils.Fatal(err)
 	}
 

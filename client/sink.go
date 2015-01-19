@@ -56,7 +56,7 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 		done <- struct{}{}
 	}(done)
 
-	if err := client.Call("RpcServer.Add", &server.RPCReq{
+	if err := client.Call("RPCServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{pipeName},
 			Meta: *meta,
@@ -68,7 +68,7 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 	}
 
 	onexit.Defer(func() {
-		if err := client.Call("RpcServer.Stop", id, &response); err != nil {
+		if err := client.Call("RPCServer.Stop", id, &response); err != nil {
 			_removePipe(p)
 			utils.Fatal(err)
 		}
@@ -96,7 +96,7 @@ func _addSinkAgentCmd(client *rpc.Client, meta *agents.AgentMetadata,
 
 	meta.Role = role
 
-	if err := client.Call("RpcServer.Add", &server.RPCReq{
+	if err := client.Call("RPCServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: args,
 			Meta: *meta,

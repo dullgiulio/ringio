@@ -33,7 +33,7 @@ func (c *CommandPing) Run(cli *Cli) error {
 
 	resp := 0
 
-	callRes := c.client.Go("RpcServer.Ping", &server.RPCReq{}, &resp, nil)
+	callRes := c.client.Go("RPCServer.Ping", &server.RPCReq{}, &resp, nil)
 
 	select {
 	case <-callRes.Done:

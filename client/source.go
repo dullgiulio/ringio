@@ -29,7 +29,7 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RPCResp, meta *agen
 
 	meta.Role = agents.AgentRoleSource
 
-	if err := client.Call("RpcServer.Add", &server.RPCReq{
+	if err := client.Call("RPCServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: []string{pipeName},
 			Meta: *meta,
@@ -43,7 +43,7 @@ func addSourceAgentPipe(client *rpc.Client, response *server.RPCResp, meta *agen
 	p.Remove()
 
 	onexit.Defer(func() {
-		if err := client.Call("RpcServer.Stop", id, &response); err != nil {
+		if err := client.Call("RPCServer.Stop", id, &response); err != nil {
 			utils.Fatal(err)
 		}
 	})
@@ -61,7 +61,7 @@ func addSourceAgentCmd(client *rpc.Client, response *server.RPCResp, meta *agent
 
 	meta.Role = agents.AgentRoleSource
 
-	if err := client.Call("RpcServer.Add", &server.RPCReq{
+	if err := client.Call("RPCServer.Add", &server.RPCReq{
 		Agent: &agents.AgentDescr{
 			Args: args,
 			Meta: *meta,

@@ -45,7 +45,7 @@ func (c *CommandStop) Run(cli *Cli) error {
 	}
 
 	for _, id := range in {
-		if err := c.client.Call("RpcServer.Stop", id, &c.response); err != nil {
+		if err := c.client.Call("RPCServer.Stop", id, &c.response); err != nil {
 			utils.Error(err)
 		}
 	}
