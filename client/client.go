@@ -76,7 +76,11 @@ func (cli *Cli) ParseArgs(args []string) error {
 
 	helpMode := false
 
-	cli.Session = args[1]
+	if len(args) <= 1 {
+		cli.Session = "help"
+	} else {
+		cli.Session = args[1]
+	}
 
 	switch cli.Session {
 	case "help":
