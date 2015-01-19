@@ -70,7 +70,7 @@ func TestWriteToRingbuf(t *testing.T) {
 		t.Error("Cancelling writeToRingbuf didn't cancel")
 	}
 
-	ring.Eof()
+	ring.EOF()
 
 	reader := ringbuf.NewReader(ring)
 	readCh := reader.ReadCh()
@@ -101,7 +101,7 @@ func TestReadFromRingbuf(t *testing.T) {
 		ring.Write(m)
 	}
 
-	ring.Eof()
+	ring.EOF()
 
 	cancel := make(chan bool)
 
