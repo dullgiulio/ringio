@@ -103,7 +103,7 @@ func (cli *Cli) ParseArgs(args []string) error {
 
 	cli.argsLen = len(args) - 3
 	if cli.argsLen < 0 {
-		return nil
+		return fmt.Errorf("No command specified")
 	}
 
 	cli.CommandStr = args[2]
