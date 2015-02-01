@@ -101,9 +101,9 @@ func (cli *Cli) ParseArgs(args []string) error {
 		onexit.Exit(1)
 	}
 
-    if cli.Session == "" {
-        return nil
-    }
+	if cli.Session == "" {
+		return nil
+	}
 
 	cli.argsLen = len(args) - 3
 	if cli.argsLen < 0 {

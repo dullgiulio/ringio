@@ -70,7 +70,7 @@ func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel 
 }
 
 func _readInnerLoop(c <-chan interface{}, cancel <-chan bool,
-	output *bufio.Writer, filter *msg.Filter) (cancelled bool) {
+	output io.Writer, filter *msg.Filter, format msg.Format) (cancelled bool) {
 	for {
 		select {
 		case data := <-c:
@@ -84,16 +84,8 @@ func _readInnerLoop(c <-chan interface{}, cancel <-chan bool,
 				continue
 			}
 
-			if _, err := output.Write(m.Data()); err != nil {
+			if _, err := m.WriteFormat(output, format); err != nil {
 				log.Error(log.FacilityAgent, fmt.Errorf("bufio.Write: %v", err))
-				return
-			}
-			if err := output.WriteByte('\n'); err != nil {
-				log.Error(log.FacilityAgent, fmt.Errorf("bufio.WriteByte: %v", err))
-				return
-			}
-			if err := output.Flush(); err != nil {
-				log.Error(log.FacilityAgent, fmt.Errorf("bufio.Flush: %v", err))
 				return
 			}
 		case <-cancel:
@@ -103,7 +95,7 @@ func _readInnerLoop(c <-chan interface{}, cancel <-chan bool,
 	}
 }
 
-func readFromRingbuf(writer io.WriteCloser, filter *msg.Filter,
+func readFromRingbuf(writer io.WriteCloser, filter *msg.Filter, flags msg.Format,
 	ring *ringbuf.Ringbuf, readerOpts *ringbuf.ReaderOptions,
 	cancel <-chan bool, wg *sync.WaitGroup) (cancelled bool) {
 	if wg != nil {
@@ -116,10 +108,9 @@ func readFromRingbuf(writer io.WriteCloser, filter *msg.Filter,
 		reader.SetOptions(readerOpts)
 	}
 
-	output := bufio.NewWriter(writer)
 	c := reader.ReadCh()
 
-	cancelled = _readInnerLoop(c, cancel, output, filter)
+	cancelled = _readInnerLoop(c, cancel, writer, filter, flags)
 
 	reader.Cancel()
 	writer.Close()

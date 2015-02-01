@@ -102,7 +102,7 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 }
 
 func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
-	cancelled := readFromRingbuf(a.pipe, filter, rOutput,
+	cancelled := readFromRingbuf(a.pipe, filter, a.meta.Options.getMask(), rOutput,
 		makeReaderOptions(a.meta.Options), a.cancelCh, nil)
 
 	if !cancelled {

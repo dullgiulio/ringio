@@ -105,7 +105,7 @@ func TestReadFromRingbuf(t *testing.T) {
 
 	cancel := make(chan bool)
 
-	cancelled := readFromRingbuf(BufferCloser(buf), nil, ring, nil, cancel, nil)
+	cancelled := readFromRingbuf(BufferCloser(buf), nil, msg.FORMAT_NEWLINE, ring, nil, cancel, nil)
 
 	if cancelled {
 		t.Error("Did not expect readFromRingbuf to be cancelled")

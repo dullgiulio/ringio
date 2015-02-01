@@ -29,7 +29,16 @@ func NewAgentMetadata() *AgentMetadata {
 }
 
 type AgentOptions struct {
-	NoWait bool
+	NoWait    bool
+	PrintMeta bool
+}
+
+func (ao *AgentOptions) getMask() msg.Format {
+	if ao.PrintMeta {
+		return msg.FORMAT_META | msg.FORMAT_NEWLINE
+	}
+
+	return msg.FORMAT_NEWLINE
 }
 
 type Agent interface {

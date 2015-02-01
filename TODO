@@ -1,5 +1,3 @@
-* "output" needs a --meta option to print agent ID and timestamp.
-
 * ringio -k <session-name> -> forbicly remove a session socket.
 
 * Use a decent (non-std library) flags parsing library.

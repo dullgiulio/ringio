@@ -176,7 +176,7 @@ func (a *AgentCmd) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf,
 
 	go writeToRingbuf(id, stdout, rStdout, a.cancelInCh, wg)
 	go writeToRingbuf(id, stderr, rErrors, a.cancelInCh, wg)
-	go readFromRingbuf(stdin, filter, rOutput, makeReaderOptions(a.meta.Options), a.cancelOutCh, wg)
+	go readFromRingbuf(stdin, filter, a.meta.Options.getMask(), rOutput, makeReaderOptions(a.meta.Options), a.cancelOutCh, wg)
 
 	wg.Wait()
 
