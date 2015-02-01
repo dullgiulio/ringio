@@ -1,9 +1,13 @@
 * "output" needs a --meta option to print agent ID and timestamp.
 
-* ringio -k <session-name> -> forbicly remove a session socket
+* ringio -k <session-name> -> forbicly remove a session socket.
 
-* seekable ringbuf (reader can seek to beginning or end)
+* Use a decent (non-std library) flags parsing library.
 
-* see fio ( http://linux.die.net/man/1/fio ) for options and ideas.
-* see splice(2) for an almost zero-copy data piping between commands.
+* Reimplement as library with different backends:
+  - On linux, implement a epoll backend
+  - Backend without ringbuffer
 
+* Add documentation to all public functions of the new package.
+
+* seekable ringbuf (reader can seek to beginning or end.)
