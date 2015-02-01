@@ -1,7 +1,9 @@
 package msg
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -31,24 +33,31 @@ func Msg(senderID int, data []byte) Message {
 }
 
 // XXX: We implement only the combinations we actually use.
-func (m Message) Format(f Format) string {
+func (m Message) WriteFormat(w io.Writer, f Format) (int, error) {
 	mask := FORMAT_META | FORMAT_NEWLINE
 
 	if (f & mask) == mask {
-		return fmt.Sprintf("%d %d %s\n", m.senderID, m.time, m.data)
+		return fmt.Fprintf(w, "%d %d %s\n", m.senderID, m.time, m.data)
 	}
 
 	mask = FORMAT_META
 
 	if (f & mask) == mask {
-		return fmt.Sprintf("%d %d %s", m.senderID, m.time, m.data)
+		return fmt.Fprintf(w, "%d %d %s", m.senderID, m.time, m.data)
 	}
 
 	if (f & FORMAT_NEWLINE) == FORMAT_NEWLINE {
-		return fmt.Sprintf("%s\n", m.data)
+		return fmt.Fprintf(w, "%s\n", m.data)
 	}
 
-	return fmt.Sprintf("%s", m.data)
+	return fmt.Fprintf(w, "%s", m.data)
+}
+
+func (m Message) Format(f Format) string {
+	var b bytes.Buffer
+
+	m.WriteFormat(&b, f)
+	return b.String()
 }
 
 func (m Message) String() string {
