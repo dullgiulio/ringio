@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
+type Flags int
+
 const (
-	MSG_FORMAT_NULL = 1 << iota
+	MSG_FORMAT_NULL Flags = 1 << iota
 	MSG_FORMAT_ID
 	MSG_FORMAT_TIMESTAMP
 	MSG_FORMAT_DATA
@@ -29,7 +31,7 @@ func Msg(senderID int, data []byte) Message {
 }
 
 // XXX: We implement only the combinations we actually use.
-func (m Message) Format(f int) string {
+func (m Message) Format(f Flags) string {
 	mask := MSG_FORMAT_META | MSG_FORMAT_NEWLINE
 
 	if (f & mask) == mask {
