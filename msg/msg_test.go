@@ -14,6 +14,26 @@ func TestString(t *testing.T) {
 	}
 }
 
+func TestFormat(t *testing.T) {
+	m := Message{10, 1416926265, []byte("Some text here")}
+
+	if m.Format(MSG_FORMAT_META|MSG_FORMAT_NEWLINE) != "10 1416926265 Some text here\n" {
+		t.Error("Unexpected formatted message with newline")
+	}
+
+	if m.Format(MSG_FORMAT_META) != "10 1416926265 Some text here" {
+		t.Error("Unexpected fromatted message")
+	}
+
+	if m.Format(MSG_FORMAT_NEWLINE) != "Some text here\n" {
+		t.Error("Unexpected data message with newline")
+	}
+
+	if m.Format(MSG_FORMAT_DATA) != "Some text here" {
+		t.Error("Unexpected data message")
+	}
+}
+
 func TestFromString(t *testing.T) {
 	msg := []byte("12 1416213479589 Test message text to parse")
 	m, err := FromString(msg)

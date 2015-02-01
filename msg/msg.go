@@ -5,6 +5,15 @@ import (
 	"time"
 )
 
+const (
+	MSG_FORMAT_NULL = 1 << iota
+	MSG_FORMAT_ID
+	MSG_FORMAT_TIMESTAMP
+	MSG_FORMAT_DATA
+	MSG_FORMAT_NEWLINE
+	MSG_FORMAT_META = MSG_FORMAT_ID | MSG_FORMAT_TIMESTAMP | MSG_FORMAT_DATA
+)
+
 type Message struct {
 	senderID int
 	time     int64
@@ -17,6 +26,27 @@ func makeTimestamp() int64 {
 
 func Msg(senderID int, data []byte) Message {
 	return Message{senderID, makeTimestamp(), data}
+}
+
+// XXX: We implement only the combinations we actually use.
+func (m Message) Format(f int) string {
+	mask := MSG_FORMAT_META | MSG_FORMAT_NEWLINE
+
+	if (f & mask) == mask {
+		return fmt.Sprintf("%d %d %s\n", m.senderID, m.time, m.data)
+	}
+
+	mask = MSG_FORMAT_META
+
+	if (f & mask) == mask {
+		return fmt.Sprintf("%d %d %s", m.senderID, m.time, m.data)
+	}
+
+	if (f & MSG_FORMAT_NEWLINE) == MSG_FORMAT_NEWLINE {
+		return fmt.Sprintf("%s\n", m.data)
+	}
+
+	return fmt.Sprintf("%s", m.data)
 }
 
 func (m Message) String() string {
