@@ -2,38 +2,40 @@ package msg
 
 import (
 	"fmt"
-    "testing"
+	"testing"
 	"time"
 )
 
 func TestString(t *testing.T) {
 	m := Message{10, 1416926265, []byte("Some text here")}
+	tstr := time.Unix(1416926265, 0).Format(time.RFC3339)
 	mstr := m.String()
 
-	if mstr != "2014-11-25T16:37:45+02:00:  10: Some text here" {
+	if mstr != fmt.Sprintf("%s:  10: Some text here", tstr) {
 		t.Error(fmt.Errorf("Unexpected string format for Message, got '%s'", mstr))
 	}
 }
 
 func TestFormat(t *testing.T) {
 	m := Message{10, 1416926265, []byte("Some text here")}
-    mstr := m.Format(FORMAT_META|FORMAT_NEWLINE)
+	tstr := time.Unix(1416926265, 0).Format(time.RFC3339)
+	mstr := m.Format(FORMAT_META | FORMAT_NEWLINE)
 
-	if mstr != "2014-11-25T16:37:45+02:00:  10: Some text here\n" {
+	if mstr != fmt.Sprintf("%s:  10: Some text here\n", tstr) {
 		t.Error(fmt.Errorf("Unexpected formatted message with newline, got '%s'", mstr))
 	}
 
-    mstr = m.Format(FORMAT_META)
-	if mstr != "2014-11-25T16:37:45+02:00:  10: Some text here" {
+	mstr = m.Format(FORMAT_META)
+	if mstr != fmt.Sprintf("%s:  10: Some text here", tstr) {
 		t.Error(fmt.Errorf("Unexpected formatted message, got '%s'", mstr))
 	}
 
-    mstr = m.Format(FORMAT_NEWLINE)
+	mstr = m.Format(FORMAT_NEWLINE)
 	if mstr != "Some text here\n" {
 		t.Error(fmt.Errorf("Unexpected data message with newline, got '%s'", mstr))
 	}
 
-    mstr = m.Format(FORMAT_DATA)
+	mstr = m.Format(FORMAT_DATA)
 	if mstr != "Some text here" {
 		t.Error(fmt.Errorf("Unexpected data message, got '%s'", mstr))
 	}
