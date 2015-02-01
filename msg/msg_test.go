@@ -9,7 +9,7 @@ func TestString(t *testing.T) {
 	m := Message{10, 1416926265, []byte("Some text here")}
 	mstr := m.String()
 
-	if mstr != "10 1416926265 Some text here" {
+	if mstr != "2014-11-25T16:37:45+02:00:  10: Some text here" {
 		t.Error("Unexpected string format for Message")
 	}
 }
@@ -17,11 +17,11 @@ func TestString(t *testing.T) {
 func TestFormat(t *testing.T) {
 	m := Message{10, 1416926265, []byte("Some text here")}
 
-	if m.Format(FORMAT_META|FORMAT_NEWLINE) != "10 1416926265 Some text here\n" {
+	if m.Format(FORMAT_META|FORMAT_NEWLINE) != "2014-11-25T16:37:45+02:00:  10: Some text here\n" {
 		t.Error("Unexpected formatted message with newline")
 	}
 
-	if m.Format(FORMAT_META) != "10 1416926265 Some text here" {
+	if m.Format(FORMAT_META) != "2014-11-25T16:37:45+02:00:  10: Some text here" {
 		t.Error("Unexpected fromatted message")
 	}
 
@@ -34,19 +34,19 @@ func TestFormat(t *testing.T) {
 	}
 }
 
-func TestFromString(t *testing.T) {
-	msg := []byte("12 1416213479589 Test message text to parse")
-	m, err := FromString(msg)
+func TestParse(t *testing.T) {
+	msg := []byte("2014-11-25T16:37:45+02:00:   5: Test message text to parse")
+	m, err := Parse(msg)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if m.senderID != 12 {
+	if m.senderID != 5 {
 		t.Error("Expected senderID to be set correctly")
 	}
 
-	if m.time != 1416213479589 {
+	if m.time != 1416926265 {
 		t.Error("Expected time to be set correctly")
 	}
 
@@ -86,8 +86,8 @@ func TestCasting(t *testing.T) {
 }
 
 func TestInvalid(t *testing.T) {
-	str := []byte("no string But string was expected")
-	_, err := FromString(str)
+	str := []byte("no string but string was expected")
+	_, err := Parse(str)
 
 	if err == nil {
 		t.Error("Expected error after passing invalid message")

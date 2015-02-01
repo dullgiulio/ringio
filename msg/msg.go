@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -37,13 +39,13 @@ func (m Message) WriteFormat(w io.Writer, f Format) (int, error) {
 	mask := FORMAT_META | FORMAT_NEWLINE
 
 	if (f & mask) == mask {
-		return fmt.Fprintf(w, "%d %d %s\n", m.senderID, m.time, m.data)
+		return fmt.Fprintf(w, "%s: % 3d: %s\n", time.Unix(m.time, 0).Format(time.RFC3339), m.senderID, m.data)
 	}
 
 	mask = FORMAT_META
 
 	if (f & mask) == mask {
-		return fmt.Fprintf(w, "%d %d %s", m.senderID, m.time, m.data)
+		return fmt.Fprintf(w, "%s: % 3d: %s", time.Unix(m.time, 0).Format(time.RFC3339), m.senderID, m.data)
 	}
 
 	if (f & FORMAT_NEWLINE) == FORMAT_NEWLINE {
@@ -61,36 +63,40 @@ func (m Message) Format(f Format) string {
 }
 
 func (m Message) String() string {
-	return fmt.Sprintf("%d %d %s", m.senderID, m.time, m.data)
+	return fmt.Sprintf("%s: % 3d: %s", time.Unix(m.time, 0).Format(time.RFC3339), m.senderID, m.data)
 }
 
 func (m Message) Data() []byte {
 	return m.data
 }
 
-func FromString(msg []byte) (Message, error) {
+func Parse(msg []byte) (Message, error) {
 	m := Message{}
-	ws := 0
-	l := len(msg)
-	metastr := ""
 
-	for i := 0; i < l; i++ {
-		if msg[i] == ' ' {
-			ws++
-		}
-
-		if ws > 1 {
-			m.data = msg[i+1:]
-			metastr = string(msg[:i])
-			break
-		}
+	if len(msg) < 34 {
+		return m, fmt.Errorf("Invalid string to parse: string too short")
 	}
 
-	if metastr != "" {
-		if _, err := fmt.Sscanf(metastr, "%d %d", &m.senderID, &m.time); err != nil {
-			return m, err
-		}
+	if t, err := time.Parse(time.RFC3339, string(msg[0:25])); err != nil {
+		return m, err
+	} else {
+		m.time = t.Unix()
 	}
+
+	str := string(msg[27:])
+	end := strings.Index(str, ": ")
+
+	if end < 0 {
+		return m, fmt.Errorf("Invalid string to parse: agent ID not found")
+	}
+
+	if senderid, err := strconv.Atoi(strings.TrimSpace(str[0:end])); err != nil {
+		return m, err
+	} else {
+		m.senderID = senderid
+	}
+
+	m.data = []byte(str[end+2:])
 
 	return m, nil
 }
