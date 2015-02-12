@@ -1,3 +1,6 @@
+* Must pass the current ENV to the server when adding a new command (flag to switch this off).
+* Show ENV in verbose listing.
+
 * ringio -k <session-name> -> forbicly remove a session socket.
 
 * Use a decent (non-std library) flags parsing library.
