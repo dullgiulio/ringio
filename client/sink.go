@@ -67,9 +67,10 @@ func _addSinkAgentPipe(client *rpc.Client, meta *agents.AgentMetadata,
 		utils.Fatal(err)
 	}
 
+	_removePipe(p)
+
 	onexit.Defer(func() {
 		if err := client.Call("RPCServer.Stop", id, &response); err != nil {
-			_removePipe(p)
 			utils.Fatal(err)
 		}
 	})
