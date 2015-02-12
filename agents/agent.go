@@ -17,6 +17,7 @@ type AgentMetadata struct {
 	Finished time.Time
 	User     string
 	Name     string
+	Env      []string
 	Filter   *msg.Filter
 	Options  *AgentOptions
 }

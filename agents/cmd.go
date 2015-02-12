@@ -19,12 +19,14 @@ type AgentCmd struct {
 }
 
 func NewAgentCmd(cmd []string, meta *AgentMetadata) *AgentCmd {
-	return &AgentCmd{
+	a := &AgentCmd{
 		cmd:         exec.Command(cmd[0], cmd[1:]...),
 		meta:        meta,
 		cancelInCh:  make(chan bool),
 		cancelOutCh: make(chan bool),
 	}
+	a.cmd.Env = a.meta.Env
+	return a
 }
 
 func (a *AgentCmd) Init() {
