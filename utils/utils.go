@@ -19,13 +19,21 @@ func getBasepath(home string) string {
 	return path.Join(home, ".ringio")
 }
 
+func getRingioHome() string {
+	home := os.Getenv("RINGIO_HOME")
+	if home == "" {
+		return os.Getenv("HOME")
+	}
+	return home
+}
+
 func GetDotfileDir() string {
 	if _dotfileDir != "" {
 		return _dotfileDir
 	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	basepath := getBasepath(os.Getenv("HOME"))
+	basepath := getBasepath(getRingioHome())
 
 	if os.MkdirAll(basepath, 0750) != nil {
 		panic("Unable to create directory for tagfile!")
