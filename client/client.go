@@ -57,6 +57,7 @@ var cmdCommand = map[string]Command{
 	"in":     Input,
 	"output": Output,
 	"out":    Output,
+	"io":	  IO,
 	"errors": Error,
 	"error":  Error,
 	"err":    Error,
