@@ -36,7 +36,7 @@ func GetDotfileDir() string {
 	basepath := getBasepath(getRingioHome())
 
 	if os.MkdirAll(basepath, 0750) != nil {
-		panic("Unable to create directory for tagfile!")
+		panic("Unable to create directory for ringio home!")
 	}
 
 	_dotfileDir = basepath
