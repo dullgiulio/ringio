@@ -61,7 +61,7 @@ $ ringio my-session output 3
 You need the Go lang development environment installed and set up:
 
 ```bash
-$ go get -u github.org/dullgiulio/ringio
+$ go get -u github.com/dullgiulio/ringio
 ```
 
 Please see [the releases page](https://github.com/dullgiulio/ringio/releases) for further information.
