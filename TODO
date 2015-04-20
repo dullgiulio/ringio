@@ -1,5 +1,7 @@
 * Show ENV in verbose listing.
 
+* Building with -race shows problems in pipe.go
+
 * ringio -k <session-name> -> forbicly remove a session socket.
 
 * Use a decent (non-std library) flags parsing library.

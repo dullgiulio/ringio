@@ -94,7 +94,7 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 
 	id := a.meta.ID
 
-	cancelled := writeToRingbuf(id, a.pipe, rOutput, a.cancelCh, nil)
+	cancelled := writeToRingbuf(id, a.pipe.File(), rOutput, a.cancelCh, nil)
 
 	if !cancelled {
 		<-a.cancelCh
@@ -112,7 +112,7 @@ func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf
 		// Wait for the client to be ready to receive
 		<-a.writeCh
 
-		cancelled := readFromRingbuf(a.pipe, filter, a.meta.Options.getMask(), rOutput,
+		cancelled := readFromRingbuf(a.pipe.File(), filter, a.meta.Options.getMask(), rOutput,
 			makeReaderOptions(a.meta.Options), a.cancelCh, nil)
 
 		if !cancelled {
