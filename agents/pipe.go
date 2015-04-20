@@ -29,15 +29,6 @@ func (a *AgentPipe) Init() {
 	if a.meta.Options == nil {
 		a.meta.Options = &AgentOptions{}
 	}
-
-	if a.meta.Role == AgentRoleSink ||
-		a.meta.Role == AgentRoleErrors ||
-		a.meta.Role == AgentRoleLog {
-		if ok := a.pipe.OpenWrite(); !ok {
-			// TODO:XXX: Must return the error to the user.
-			return
-		}
-	}
 }
 
 func (a *AgentPipe) Meta() *AgentMetadata {
@@ -61,7 +52,6 @@ func (a *AgentPipe) cancel() error {
 		a.cancelCh <- true
 	}
 
-	a.pipe.Close()
 	return nil
 }
 
@@ -101,6 +91,7 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 	}
 
 	close(a.cancelCh)
+	a.pipe.Close()
 }
 
 func (a *AgentPipe) StartWrite() {
@@ -108,18 +99,22 @@ func (a *AgentPipe) StartWrite() {
 }
 
 func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
-	go func() {
-		// Wait for the client to be ready to receive
-		<-a.writeCh
+	if ok := a.pipe.OpenWrite(); !ok {
+		// TODO:XXX: Must return the error to the user.
+		return
+	}
 
-		cancelled := readFromRingbuf(a.pipe.File(), filter, a.meta.Options.getMask(), rOutput,
-			makeReaderOptions(a.meta.Options), a.cancelCh, nil)
+	// Wait for the client to be ready to receive
+	<-a.writeCh
 
-		if !cancelled {
-			<-a.cancelCh
-		}
+	cancelled := readFromRingbuf(a.pipe.File(), filter, a.meta.Options.getMask(), rOutput,
+		makeReaderOptions(a.meta.Options), a.cancelCh, nil)
 
-		close(a.cancelCh)
-		close(a.writeCh)
-	}()
+	if !cancelled {
+		<-a.cancelCh
+	}
+
+	close(a.cancelCh)
+	close(a.writeCh)
+	a.pipe.Close()
 }

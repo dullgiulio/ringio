@@ -23,7 +23,8 @@ func makeReaderOptions(opts *AgentOptions) *ringbuf.ReaderOptions {
 	return ropts
 }
 
-// TODO: Must make this terminate somehow.
+// TODO:XXX: Causes data race. This routine should terminate when the reader is closed
+// 			 This probably means it needs to be moved somewhere else.
 func writeToChan(c chan<- []byte, cancel chan bool, reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
 
@@ -40,17 +41,14 @@ func writeToChan(c chan<- []byte, cancel chan bool, reader io.Reader) {
 	close(c)
 }
 
-func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel chan bool, wg *sync.WaitGroup) (cancelled bool) {
+func writeToRingbuf(id int, reader io.Reader, ring *ringbuf.Ringbuf, cancel chan bool, wg *sync.WaitGroup) (cancelled bool) {
 	if wg != nil {
 		defer wg.Done()
 	}
 
 	c := make(chan []byte)
 
-	go func() {
-		writeToChan(c, cancel, reader)
-		reader.Close()
-	}()
+	go writeToChan(c, cancel, reader)
 
 	for {
 		select {
@@ -63,7 +61,6 @@ func writeToRingbuf(id int, reader io.ReadCloser, ring *ringbuf.Ringbuf, cancel 
 		case <-cancel:
 			cancelled = true
 			log.Debug(log.FacilityAgent, "Writing into ringbuf from input has been cancelled")
-			reader.Close()
 			return
 		}
 	}
