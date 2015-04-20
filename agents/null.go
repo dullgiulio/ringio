@@ -11,6 +11,7 @@ type AgentNull struct {
 }
 
 func NewAgentNull(id int, meta *AgentMetadata) *AgentNull {
+	meta.ID = id
 	return &AgentNull{
 		meta:   meta,
 		cancel: make(chan bool),
@@ -51,6 +52,8 @@ func (a *AgentNull) WaitFinish() error {
 	a.cancel <- true
 	return nil
 }
+
+func (a *AgentNull) StartWrite() {}
 
 func (a *AgentNull) InputToRingbuf(errors, output *ringbuf.Ringbuf) {
 	<-a.cancel

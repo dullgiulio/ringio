@@ -21,6 +21,7 @@ const (
 	agentMessageList
 	agentMessageStartAll
 	agentMessageCancel
+	agentMessageWriteReady
 )
 
 type agentMessage struct {
@@ -85,6 +86,10 @@ func (c *Collection) Stop(a Agent, response AgentMessageResponse) {
 
 func (c *Collection) List(response AgentMessageResponse) {
 	c.requestCh <- newAgentMessage(agentMessageList, response, nil)
+}
+
+func (c *Collection) WriteReady(a Agent, response AgentMessageResponse) {
+	c.requestCh <- newAgentMessage(agentMessageWriteReady, response, a)
 }
 
 func (c *Collection) add(newAgent Agent) int {
@@ -322,6 +327,10 @@ func (c *Collection) Run(autorun bool) {
 			}
 
 			msg.response.Data(&agents)
+			msg.response.Ok()
+		case agentMessageWriteReady:
+			realAgent := c.getRealAgent(msg.agent)
+			realAgent.StartWrite()
 			msg.response.Ok()
 		}
 	}

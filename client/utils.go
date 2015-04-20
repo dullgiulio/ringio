@@ -5,15 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/dullgiulio/ringio/pipe"
 	"github.com/dullgiulio/ringio/utils"
 )
-
-func _removePipe(p *pipe.Pipe) {
-	if err := p.Remove(); err != nil {
-		utils.Error(err)
-	}
-}
 
 func getAllSessions() []string {
 	dir := utils.GetDotfileDir()

@@ -185,6 +185,18 @@ func (s *RPCServer) Start(id int, result *RPCResp) error {
 	return nil
 }
 
+func (s *RPCServer) WriteReady(id int, result *RPCResp) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	na := agents.NewAgentNull(id, agents.NewAgentMetadata()) // Role is unimportant here.
+	s.ac.WriteReady(na, &s.resp)
+	s.resp.Get()
+
+	*result = true
+	return nil
+}
+
 func (s *RPCServer) Stop(id int, result *RPCResp) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()

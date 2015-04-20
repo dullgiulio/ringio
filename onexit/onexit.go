@@ -3,11 +3,13 @@ package onexit
 import (
 	"os"
 	"os/signal"
+	"sync"
 )
 
 type Func func()
 
 type onExit struct {
+	m  sync.Mutex
 	i  int
 	s  chan os.Signal
 	fs []Func
@@ -25,14 +27,23 @@ func init() {
 }
 
 func SetFunc(e func(int)) {
+	_onExit.m.Lock()
+	defer _onExit.m.Unlock()
+
 	_onExit.e = e
 }
 
 func Defer(f Func) {
+	_onExit.m.Lock()
+	defer _onExit.m.Unlock()
+
 	_onExit.fs = append(_onExit.fs, f)
 }
 
 func Exit(i int) {
+	_onExit.m.Lock()
+	defer _onExit.m.Unlock()
+
 	for _, f := range _onExit.fs {
 		f()
 	}
@@ -41,8 +52,10 @@ func Exit(i int) {
 }
 
 func PendingExit(i int) {
-	// This is not thread safe on purpose.
+	_onExit.m.Lock()
 	_onExit.i = i
+	_onExit.m.Unlock()
+
 	_onExit.s <- os.Interrupt
 }
 
@@ -51,6 +64,11 @@ func HandleInterrupt() {
 
 	go func() {
 		<-_onExit.s
-		Exit(_onExit.i)
+
+		_onExit.m.Lock()
+		i := _onExit.i
+		_onExit.m.Unlock()
+
+		Exit(i)
 	}()
 }

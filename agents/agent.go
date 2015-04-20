@@ -55,6 +55,7 @@ type Agent interface {
 	Descr() AgentDescr
 	InputToRingbuf(errors, output *ringbuf.Ringbuf)
 	OutputFromRingbuf(stdout, errors, output *ringbuf.Ringbuf, filter *msg.Filter)
+	StartWrite()
 }
 
 func (ac *Collection) isFilteringSinkAgents(filter *msg.Filter) bool {

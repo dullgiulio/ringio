@@ -3,12 +3,14 @@ package pipe
 import (
 	"fmt"
 	"os"
+	"sync"
 	"syscall"
 
 	"github.com/dullgiulio/ringio/log"
 )
 
 type Pipe struct {
+	mux      sync.Mutex
 	file     *os.File
 	filename string
 	isOpen   bool
@@ -47,6 +49,9 @@ func (p *Pipe) Create() error {
 }
 
 func (p *Pipe) OpenWriteErr() error {
+	p.mux.Lock()
+	defer p.mux.Unlock()
+
 	file, err := os.OpenFile(p.filename, os.O_RDWR|os.O_APPEND, 0600)
 	if err != nil {
 		return fmt.Errorf("Opening pipe for writing failed: %s", err)
@@ -73,6 +78,9 @@ func (p *Pipe) OpenRead() bool {
 }
 
 func (p *Pipe) OpenReadErr() error {
+	p.mux.Lock()
+	defer p.mux.Unlock()
+
 	file, err := os.Open(p.filename)
 	if err != nil {
 		return fmt.Errorf("Opening pipe for reading failed: %s", err)
@@ -89,6 +97,9 @@ func (p *Pipe) Read(b []byte) (n int, err error) {
 }
 
 func (p *Pipe) Close() (err error) {
+	p.mux.Lock()
+	defer p.mux.Unlock()
+
 	if p.isOpen {
 		err = p.file.Close()
 		p.isOpen = false

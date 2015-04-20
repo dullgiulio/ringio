@@ -13,6 +13,7 @@ type AgentPipe struct {
 	pipe     *pipe.Pipe
 	meta     *AgentMetadata
 	cancelCh chan bool
+	writeCh  chan struct{}
 }
 
 func NewAgentPipe(pipeName string, meta *AgentMetadata) *AgentPipe {
@@ -20,6 +21,7 @@ func NewAgentPipe(pipeName string, meta *AgentMetadata) *AgentPipe {
 		pipe:     pipe.New(pipeName),
 		meta:     meta,
 		cancelCh: make(chan bool),
+		writeCh:  make(chan struct{}),
 	}
 }
 
@@ -101,13 +103,23 @@ func (a *AgentPipe) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 	close(a.cancelCh)
 }
 
+func (a *AgentPipe) StartWrite() {
+	a.writeCh <- struct{}{}
+}
+
 func (a *AgentPipe) OutputFromRingbuf(rStdout, rErrors, rOutput *ringbuf.Ringbuf, filter *msg.Filter) {
-	cancelled := readFromRingbuf(a.pipe, filter, a.meta.Options.getMask(), rOutput,
-		makeReaderOptions(a.meta.Options), a.cancelCh, nil)
+	go func() {
+		// Wait for the client to be ready to receive
+		<-a.writeCh
 
-	if !cancelled {
-		<-a.cancelCh
-	}
+		cancelled := readFromRingbuf(a.pipe, filter, a.meta.Options.getMask(), rOutput,
+			makeReaderOptions(a.meta.Options), a.cancelCh, nil)
 
-	close(a.cancelCh)
+		if !cancelled {
+			<-a.cancelCh
+		}
+
+		close(a.cancelCh)
+		close(a.writeCh)
+	}()
 }

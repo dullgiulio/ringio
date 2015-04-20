@@ -106,6 +106,8 @@ func (a *AgentCmd) WaitFinish() error {
 	return a.cmd.Wait()
 }
 
+func (a *AgentCmd) StartWrite() {}
+
 func (a *AgentCmd) InputToRingbuf(rErrors, rOutput *ringbuf.Ringbuf) {
 	stdout, err := a.cmd.StdoutPipe()
 
